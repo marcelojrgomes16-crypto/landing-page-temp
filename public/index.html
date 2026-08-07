@@ -64,25 +64,31 @@
         }
 
         .btn-sim {
-            background: #e94560;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b81 100%);
             color: white;
             box-shadow: 0 8px 25px rgba(233, 69, 96, 0.5);
+            animation: brilhoBtn 2s infinite;
+        }
+
+        @keyframes brilhoBtn {
+            0%, 100% { box-shadow: 0 8px 25px rgba(233, 69, 96, 0.5); }
+            50% { box-shadow: 0 8px 40px rgba(233, 69, 96, 0.8); }
         }
 
         .btn-sim:hover {
-            background: #ff6b81;
             transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(233, 69, 96, 0.7);
         }
 
         .btn-nao {
-            background: #533483;
+            background: linear-gradient(135deg, #533483 0%, #6c44a2 100%);
             color: white;
             box-shadow: 0 8px 25px rgba(83, 52, 131, 0.5);
             position: relative;
         }
 
         .btn-nao:hover {
-            background: #6c44a2;
+            background: linear-gradient(135deg, #6c44a2 0%, #8b5cf6 100%);
         }
 
         /* Tela de sucesso */
@@ -96,6 +102,7 @@
             font-size: 48px;
             margin-bottom: 20px;
             animation: bounce 0.5s ease-in-out infinite alternate;
+            text-shadow: 3px 3px 10px rgba(233, 69, 96, 0.6);
         }
 
         @keyframes bounce {
@@ -128,102 +135,11 @@
         .caveira-container {
             margin: 30px auto;
             position: relative;
-            width: 300px;
-            height: 280px;
+            width: 350px;
+            height: 320px;
         }
 
-        .caveira-svg {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Animações dos ossos */
-        .osso {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .osso.montando {
-            animation: ossoVem 1s ease-out forwards;
-        }
-
-        @keyframes ossoVem {
-            0% {
-                opacity: 0;
-                transform: translate(var(--start-x), var(--start-y)) rotate(var(--start-rot));
-            }
-            100% {
-                opacity: 1;
-                transform: translate(0, 0) rotate(0deg);
-            }
-        }
-
-        .caveira-montada {
-            animation: respira 2s ease-in-out infinite;
-        }
-
-        @keyframes respira {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        /* Rosa na mão */
-        .rosa-mao {
-            opacity: 0;
-            animation: rosaAparece 0.5s ease-out forwards;
-        }
-
-        @keyframes rosaAparece {
-            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-
-        /* Olhos brilhando */
-        .olho-brilho {
-            animation: brilho 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes brilho {
-            0% { filter: drop-shadow(0 0 3px #e94560); }
-            100% { filter: drop-shadow(0 0 15px #e94560); }
-        }
-
-        /* Corações saindo da caveira */
-        .coracao-caveira {
-            position: absolute;
-            font-size: 18px;
-            animation: sobeCora 2s ease-out infinite;
-            opacity: 0;
-        }
-
-        @keyframes sobeCora {
-            0% { 
-                transform: translateY(0) scale(0.5); 
-                opacity: 0;
-            }
-            20% { 
-                opacity: 1;
-            }
-            100% { 
-                transform: translateY(-80px) scale(1.2) rotate(20deg); 
-                opacity: 0;
-            }
-        }
-
-        /* Estrelas */
-        .estrela {
-            position: absolute;
-            font-size: 14px;
-            animation: piscaEstrela 1s ease-in-out infinite;
-        }
-
-        @keyframes piscaEstrela {
-            0%, 100% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* Ossos espalhados (antes de montar) */
+        /* Ossos espalhados */
         .ossos-espalhados {
             position: absolute;
             width: 100%;
@@ -232,12 +148,150 @@
 
         .osso-solto {
             position: absolute;
+            font-size: 30px;
             animation: flutua 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
         }
 
         @keyframes flutua {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(5deg); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+
+        /* Caveira montada */
+        .caveira-montada {
+            display: none;
+            position: relative;
+            animation: respira 2s ease-in-out infinite, danca 1s ease-in-out infinite;
+        }
+
+        @keyframes respira {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        @keyframes danca {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        /* Brilho da caveira */
+        .caveira-brilho {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.4));
+            animation: pulsaBrilho 2s ease-in-out infinite;
+        }
+
+        @keyframes pulsaBrilho {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(233, 69, 96, 0.8)); }
+        }
+
+        /* Olhos brilhando */
+        .olho-brilho {
+            animation: brilhoOlho 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes brilhoOlho {
+            0% { filter: drop-shadow(0 0 5px #e94560); }
+            100% { filter: drop-shadow(0 0 20px #e94560); }
+        }
+
+        /* Rosa animada */
+        .rosa-mao {
+            opacity: 0;
+            transform-origin: bottom center;
+        }
+
+        .rosa-mao.aparecendo {
+            animation: rosaAparece 1s ease-out forwards, rosaBalanca 2s ease-in-out infinite 1s;
+        }
+
+        @keyframes rosaAparece {
+            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes rosaBalanca {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        /* Corações saindo da caveira */
+        .coracao-caveira {
+            position: absolute;
+            font-size: 20px;
+            animation: sobeCora 2s ease-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes sobeCora {
+            0% { 
+                transform: translateY(0) scale(0.5) rotate(0deg); 
+                opacity: 0;
+            }
+            20% { 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-100px) scale(1.3) rotate(30deg); 
+                opacity: 0;
+            }
+        }
+
+        /* Estrelas e brilhos */
+        .estrela {
+            position: absolute;
+            font-size: 16px;
+            animation: piscaEstrela 1s ease-in-out infinite;
+        }
+
+        @keyframes piscaEstrela {
+            0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+        }
+
+        /* Coração pulsante no peito */
+        .coracao-peito {
+            position: absolute;
+            font-size: 18px;
+            animation: pulsaCora 1s ease-in-out infinite;
+        }
+
+        @keyframes pulsaCora {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Fumaça/magia ao redor */
+        .magia {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: flutuaMagia 3s ease-in-out infinite;
+        }
+
+        @keyframes flutuaMagia {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-30px) scale(1.5); opacity: 1; }
+        }
+
+        /* Texto aparecendo */
+        .texto-romantico {
+            color: #ffb6c1;
+            font-size: 18px;
+            margin-top: 15px;
+            opacity: 0;
+            animation: apareceTexto 1s ease-out forwards 2s;
+        }
+
+        @keyframes apareceTexto {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -256,119 +310,171 @@
         <h2>EU SABIA! 💕</h2>
         <p style="color: #e94560; font-size: 24px; margin-top: 20px;">Agora somos oficialmente um casal!</p>
         
-        <!-- Caveira montando ossos -->
+        <!-- Caveira container -->
         <div class="caveira-container">
+            <!-- Magia ao redor -->
+            <div class="magia" style="top: 30px; left: 50px; animation-delay: 0s;"></div>
+            <div class="magia" style="top: 80px; right: 40px; animation-delay: 0.5s;"></div>
+            <div class="magia" style="bottom: 60px; left: 30px; animation-delay: 1s;"></div>
+            <div class="magia" style="bottom: 40px; right: 60px; animation-delay: 1.5s;"></div>
+            
             <!-- Corações saindo -->
-            <div class="coracao-caveira" style="left: 100px; top: 30px; animation-delay: 0s;">💕</div>
-            <div class="coracao-caveira" style="left: 150px; top: 20px; animation-delay: 0.7s;">💗</div>
-            <div class="coracao-caveira" style="left: 200px; top: 35px; animation-delay: 1.4s;">💖</div>
+            <div class="coracao-caveira" style="left: 120px; top: 20px; animation-delay: 0s;">💕</div>
+            <div class="coracao-caveira" style="left: 180px; top: 10px; animation-delay: 0.7s;">💗</div>
+            <div class="coracao-caveira" style="left: 240px; top: 30px; animation-delay: 1.4s;">💖</div>
             
             <!-- Estrelas -->
-            <div class="estrela" style="top: 5px; left: 30px; animation-delay: 0s;">✨</div>
-            <div class="estrela" style="top: 20px; right: 40px; animation-delay: 0.4s;">✨</div>
-            <div class="estrela" style="bottom: 50px; left: 20px; animation-delay: 0.8s;">✨</div>
-            <div class="estrela" style="bottom: 30px; right: 30px; animation-delay: 1.2s;">✨</div>
+            <div class="estrela" style="top: 10px; left: 40px; animation-delay: 0s;">✨</div>
+            <div class="estrela" style="top: 30px; right: 50px; animation-delay: 0.3s;">⭐</div>
+            <div class="estrela" style="bottom: 70px; left: 20px; animation-delay: 0.6s;">✨</div>
+            <div class="estrela" style="bottom: 50px; right: 40px; animation-delay: 0.9s;">⭐</div>
+            <div class="estrela" style="top: 100px; left: 10px; animation-delay: 1.2s;">💫</div>
+            <div class="estrela" style="top: 80px; right: 20px; animation-delay: 1.5s;">✨</div>
             
-            <!-- Ossos soltos (desaparecem quando monta) -->
+            <!-- Ossos soltos -->
             <div class="ossos-espalhados" id="ossosEspalhados">
-                <div class="osso-solto" style="top: 20px; left: 20px; animation-delay: 0s;">🦴</div>
-                <div class="osso-solto" style="top: 60px; right: 30px; animation-delay: 0.3s;">🦴</div>
-                <div class="osso-solto" style="bottom: 80px; left: 40px; animation-delay: 0.6s;">🦴</div>
-                <div class="osso-solto" style="bottom: 40px; right: 50px; animation-delay: 0.9s;">🦴</div>
-                <div class="osso-solto" style="top: 100px; left: 10px; animation-delay: 0.2s;">💀</div>
+                <div class="osso-solto" style="top: 10px; left: 30px; animation-delay: 0s;">🦴</div>
+                <div class="osso-solto" style="top: 50px; right: 40px; animation-delay: 0.3s;">🦴</div>
+                <div class="osso-solto" style="bottom: 100px; left: 50px; animation-delay: 0.6s;">🦴</div>
+                <div class="osso-solto" style="bottom: 60px; right: 60px; animation-delay: 0.9s;">🦴</div>
+                <div class="osso-solto" style="top: 120px; left: 20px; animation-delay: 0.2s;">💀</div>
+                <div class="osso-solto" style="top: 80px; left: 150px; animation-delay: 0.5s;">🦴</div>
+                <div class="osso-solto" style="bottom: 30px; left: 120px; animation-delay: 0.8s;">🦴</div>
             </div>
             
             <!-- Caveira montada -->
-            <div class="caveira-montada" id="caveiraMontada" style="display: none;">
-                <svg viewBox="0 0 200 250" width="200" height="250">
-                    <!-- Crânio -->
-                    <ellipse cx="100" cy="50" rx="45" ry="40" fill="#f5f5dc"/>
-                    <ellipse cx="100" cy="50" rx="45" ry="40" fill="url(#gradCaveira)"/>
-                    
-                    <!-- Testa -->
-                    <path d="M 55 40 Q 100 20 145 40" stroke="#d4d4aa" stroke-width="2" fill="none"/>
-                    
-                    <!-- Olhos -->
-                    <g class="olho-brilho">
-                        <ellipse cx="80" cy="50" rx="12" ry="14" fill="#1a1a2e"/>
-                        <ellipse cx="120" cy="50" rx="12" ry="14" fill="#1a1a2e"/>
-                        <circle cx="80" cy="50" r="4" fill="#e94560"/>
-                        <circle cx="120" cy="50" r="4" fill="#e94560"/>
-                    </g>
-                    
-                    <!-- Nariz -->
-                    <path d="M 95 65 L 100 75 L 105 65" stroke="#d4d4aa" stroke-width="2" fill="none"/>
-                    
-                    <!-- Boca sorrindo -->
-                    <path d="M 75 80 Q 100 100 125 80" stroke="#d4d4aa" stroke-width="3" fill="none"/>
-                    <line x1="82" y1="83" x2="82" y2="90" stroke="#d4d4aa" stroke-width="2"/>
-                    <line x1="90" y1="87" x2="90" y2="95" stroke="#d4d4aa" stroke-width="2"/>
-                    <line x1="100" y1="89" x2="100" y2="98" stroke="#d4d4aa" stroke-width="2"/>
-                    <line x1="110" y1="87" x2="110" y2="95" stroke="#d4d4aa" stroke-width="2"/>
-                    <line x1="118" y1="83" x2="118" y2="90" stroke="#d4d4aa" stroke-width="2"/>
-                    
-                    <!-- Mandíbula -->
-                    <path d="M 60 70 Q 100 120 140 70" stroke="#d4d4aa" stroke-width="2" fill="#f5f5dc"/>
-                    
-                    <!-- Coluna vertebral -->
-                    <rect x="95" y="90" width="10" height="50" fill="#f5f5dc" rx="3"/>
-                    <rect x="97" y="95" width="6" height="8" fill="#d4d4aa"/>
-                    <rect x="97" y="108" width="6" height="8" fill="#d4d4aa"/>
-                    <rect x="97" y="121" width="6" height="8" fill="#d4d4aa"/>
-                    
-                    <!-- Costelas -->
-                    <path d="M 95 100 Q 60 105 55 115" stroke="#f5f5dc" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    <path d="M 105 100 Q 140 105 145 115" stroke="#f5f5dc" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    <path d="M 95 112 Q 65 117 60 127" stroke="#f5f5dc" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    <path d="M 105 112 Q 135 117 140 127" stroke="#f5f5dc" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    <path d="M 95 124 Q 70 129 65 139" stroke="#f5f5dc" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    <path d="M 105 124 Q 130 129 135 139" stroke="#f5f5dc" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    
-                    <!-- Braço esquerdo -->
-                    <line x1="55" y1="115" x2="30" y2="160" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="30" y1="160" x2="25" y2="190" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <circle cx="25" cy="195" r="6" fill="#f5f5dc"/>
-                    
-                    <!-- Braço direito (segurando a rosa) -->
-                    <line x1="145" y1="115" x2="170" y2="160" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="170" y1="160" x2="175" y2="190" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    
-                    <!-- Mão com rosa -->
-                    <g class="rosa-mao" id="rosaMao">
-                        <circle cx="175" cy="195" r="6" fill="#f5f5dc"/>
-                        <!-- Rosa -->
-                        <line x1="175" y1="195" x2="185" y2="150" stroke="#228B22" stroke-width="3"/>
-                        <circle cx="185" cy="142" r="12" fill="#e94560"/>
-                        <circle cx="185" cy="142" r="8" fill="#ff6b81"/>
-                        <circle cx="185" cy="142" r="4" fill="#ffb6c1"/>
-                        <path d="M 178 138 Q 185 130 192 138" stroke="#e94560" stroke-width="2" fill="none"/>
-                        <path d="M 178 146 Q 185 155 192 146" stroke="#e94560" stroke-width="2" fill="none"/>
-                        <!-- Folhas -->
-                        <ellipse cx="180" cy="160" rx="6" ry="3" fill="#228B22" transform="rotate(-30 180 160)"/>
-                        <ellipse cx="188" cy="155" rx="6" ry="3" fill="#228B22" transform="rotate(30 188 155)"/>
-                    </g>
-                    
-                    <!-- Pernas -->
-                    <line x1="85" y1="140" x2="75" y2="200" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="75" y1="200" x2="70" y2="230" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <ellipse cx="70" cy="235" rx="10" ry="6" fill="#f5f5dc"/>
-                    
-                    <line x1="115" y1="140" x2="125" y2="200" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="125" y1="200" x2="130" y2="230" stroke="#f5f5dc" stroke-width="5" stroke-linecap="round"/>
-                    <ellipse cx="130" cy="235" rx="10" ry="6" fill="#f5f5dc"/>
-                    
-                    <!-- Gradiente -->
-                    <defs>
-                        <linearGradient id="gradCaveira" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#f5f5dc;stop-opacity:0.5" />
-                            <stop offset="100%" style="stop-color:#d4d4aa;stop-opacity:0.5" />
-                        </linearGradient>
-                    </defs>
-                </svg>
+            <div class="caveira-montada" id="caveiraMontada">
+                <div class="caveira-brilho">
+                    <svg viewBox="0 0 280 300" width="280" height="300">
+                        <!-- Coração pulsante no peito -->
+                        <g class="coracao-peito" style="transform-origin: 140px 180px;">
+                            <path d="M140 175 C140 175, 125 160, 125 150 C125 140, 135 135, 140 145 C145 135, 155 140, 155 150 C155 160, 140 175, 140 175" fill="#e94560"/>
+                        </g>
+                        
+                        <!-- Crânio detalhado -->
+                        <ellipse cx="140" cy="60" rx="55" ry="50" fill="#f5f5dc"/>
+                        <ellipse cx="140" cy="60" rx="55" ry="50" fill="url(#gradCaveira)"/>
+                        
+                        <!-- Testa com sulcos -->
+                        <path d="M 85 45 Q 140 25 195 45" stroke="#d4d4aa" stroke-width="2" fill="none"/>
+                        <path d="M 95 55 Q 140 40 185 55" stroke="#d4d4aa" stroke-width="1.5" fill="none"/>
+                        
+                        <!-- Sobrancelhas -->
+                        <path d="M 100 55 L 120 52" stroke="#d4d4aa" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M 180 55 L 160 52" stroke="#d4d4aa" stroke-width="3" stroke-linecap="round"/>
+                        
+                        <!-- Olhos brilhantes -->
+                        <g class="olho-brilho">
+                            <ellipse cx="115" cy="65" rx="15" ry="17" fill="#1a1a2e"/>
+                            <ellipse cx="165" cy="65" rx="15" ry="17" fill="#1a1a2e"/>
+                            <circle cx="115" cy="65" r="6" fill="#e94560">
+                                <animate attributeName="r" values="6;8;6" dur="1s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="165" cy="65" r="6" fill="#e94560">
+                                <animate attributeName="r" values="6;8;6" dur="1s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="112" cy="62" r="2" fill="white"/>
+                            <circle cx="162" cy="62" r="2" fill="white"/>
+                        </g>
+                        
+                        <!-- Nariz -->
+                        <path d="M 135 80 L 140 92 L 145 80" stroke="#d4d4aa" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        
+                        <!-- Boca sorrindo com dentes -->
+                        <path d="M 110 100 Q 140 125 170 100" stroke="#d4d4aa" stroke-width="3" fill="none"/>
+                        <line x1="118" y1="103" x2="118" y2="112" stroke="#d4d4aa" stroke-width="2"/>
+                        <line x1="128" y1="107" x2="128" y2="118" stroke="#d4d4aa" stroke-width="2"/>
+                        <line x1="140" y1="110" x2="140" y2="122" stroke="#d4d4aa" stroke-width="2"/>
+                        <line x1="152" y1="107" x2="152" y2="118" stroke="#d4d4aa" stroke-width="2"/>
+                        <line x1="162" y1="103" x2="162" y2="112" stroke="#d4d4aa" stroke-width="2"/>
+                        
+                        <!-- Mandíbula -->
+                        <path d="M 85 85 Q 140 140 195 85" stroke="#d4d4aa" stroke-width="2" fill="#f5f5dc"/>
+                        
+                        <!-- Coluna vertebral detalhada -->
+                        <rect x="132" y="115" width="16" height="60" fill="#f5f5dc" rx="4"/>
+                        <rect x="135" y="120" width="10" height="10" fill="#d4d4aa" rx="2"/>
+                        <rect x="135" y="135" width="10" height="10" fill="#d4d4aa" rx="2"/>
+                        <rect x="135" y="150" width="10" height="10" fill="#d4d4aa" rx="2"/>
+                        <rect x="135" y="165" width="10" height="10" fill="#d4d4aa" rx="2"/>
+                        
+                        <!-- Costelas elegantes -->
+                        <path d="M 132 125 Q 85 130 75 145" stroke="#f5f5dc" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M 148 125 Q 195 130 205 145" stroke="#f5f5dc" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M 132 140 Q 90 145 82 160" stroke="#f5f5dc" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M 148 140 Q 190 145 198 160" stroke="#f5f5dc" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M 132 155 Q 95 160 88 175" stroke="#f5f5dc" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M 148 155 Q 185 160 192 175" stroke="#f5f5dc" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        
+                        <!-- Braço esquerdo (acenando) -->
+                        <g style="animation: acena 1s ease-in-out infinite;">
+                            <line x1="75" y1="145" x2="40" y2="190" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                            <line x1="40" y1="190" x2="25" y2="230" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                            <circle cx="25" cy="235" r="8" fill="#f5f5dc"/>
+                            <!-- Dedos -->
+                            <line x1="20" y1="230" x2="15" y2="225" stroke="#f5f5dc" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="25" y1="228" x2="22" y2="222" stroke="#f5f5dc" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="30" y1="230" x2="33" y2="224" stroke="#f5f5dc" stroke-width="3" stroke-linecap="round"/>
+                        </g>
+                        
+                        <!-- Braço direito (segurando rosa) -->
+                        <line x1="205" y1="145" x2="240" y2="190" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                        <line x1="240" y1="190" x2="250" y2="230" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                        
+                        <!-- Mão com rosa -->
+                        <g class="rosa-mao" id="rosaMao">
+                            <circle cx="250" cy="235" r="8" fill="#f5f5dc"/>
+                            <!-- Dedos segurando -->
+                            <line x1="245" y1="230" x2="240" y2="225" stroke="#f5f5dc" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="250" y1="228" x2="248" y2="222" stroke="#f5f5dc" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="255" y1="230" x2="258" y2="224" stroke="#f5f5dc" stroke-width="3" stroke-linecap="round"/>
+                            
+                            <!-- Caule da rosa -->
+                            <line x1="250" y1="230" x2="258" y2="170" stroke="#228B22" stroke-width="4"/>
+                            
+                            <!-- Rosa grande e bonita -->
+                            <g>
+                                <circle cx="258" cy="160" r="18" fill="#e94560"/>
+                                <circle cx="258" cy="160" r="13" fill="#ff6b81"/>
+                                <circle cx="258" cy="160" r="8" fill="#ffb6c1"/>
+                                <circle cx="258" cy="160" r="4" fill="#fff"/>
+                                <path d="M 248 152 Q 258 142 268 152" stroke="#e94560" stroke-width="2" fill="none"/>
+                                <path d="M 248 168 Q 258 178 268 168" stroke="#e94560" stroke-width="2" fill="none"/>
+                                <path d="M 243 160 Q 238 155 243 148" stroke="#e94560" stroke-width="2" fill="none"/>
+                                <path d="M 273 160 Q 278 155 273 148" stroke="#e94560" stroke-width="2" fill="none"/>
+                            </g>
+                            
+                            <!-- Folhas -->
+                            <ellipse cx="250" cy="185" rx="10" ry="5" fill="#228B22" transform="rotate(-40 250 185)"/>
+                            <ellipse cx="265" cy="180" rx="10" ry="5" fill="#228B22" transform="rotate(30 265 180)"/>
+                            <ellipse cx="255" cy="195" rx="8" ry="4" fill="#2d5016" transform="rotate(-20 255 195)"/>
+                        </g>
+                        
+                        <!-- Pernas -->
+                        <line x1="120" y1="175" x2="105" y2="240" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                        <line x1="105" y1="240" x2="95" y2="275" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                        <ellipse cx="95" cy="280" rx="15" ry="8" fill="#f5f5dc"/>
+                        
+                        <line x1="160" y1="175" x2="175" y2="240" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                        <line x1="175" y1="240" x2="185" y2="275" stroke="#f5f5dc" stroke-width="6" stroke-linecap="round"/>
+                        <ellipse cx="185" cy="280" rx="15" ry="8" fill="#f5f5dc"/>
+                        
+                        <!-- Gradiente -->
+                        <defs>
+                            <linearGradient id="gradCaveira" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f5f5dc;stop-opacity:0.4" />
+                                <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.2" />
+                                <stop offset="100%" style="stop-color:#d4d4aa;stop-opacity:0.4" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
             </div>
         </div>
         
-        <div class="coracoes-grandes">💀💕💀</div>
+        <p class="texto-romantico">Para sempre juntos... 💀💕</p>
+        
+        <div class="coracoes-grandes" style="margin-top: 20px;">💀💕💀</div>
     </div>
 
     <script>
@@ -381,8 +487,8 @@
             const larguraTela = window.innerWidth;
             const alturaTela = window.innerHeight;
             
-            const novaX = Math.random() * (larguraTela - 200);
-            const novaY = Math.random() * (alturaTela - 80);
+            const novaX = Math.random() * (larguraTela - 250);
+            const novaY = Math.random() * (alturaTela - 100);
             
             btnNao.style.left = novaX + 'px';
             btnNao.style.top = novaY + 'px';
@@ -393,7 +499,7 @@
             btnNao.style.padding = '18px 50px';
             
             // Texto muda
-            const textos = ['Não 😢', 'Ah não...', 'Por favor!', 'Não fui...', 'Tá bom 😭', 'Sem chance!', 'Esquece...'];
+            const textos = ['Não 😢', 'Ah não...', 'Por favor!', 'Não fui...', 'Tá bom 😭', 'Sem chance!', 'Esquece...', 'Nunca! 💀'];
             btnNao.textContent = textos[Math.min(cliqueCount, textos.length - 1)];
         }
 
@@ -409,27 +515,34 @@
             const montada = document.getElementById('caveiraMontada');
             const rosa = document.getElementById('rosaMao');
             
-            // Espera um pouco e começa a montar
+            // Espera e começa a montar
             setTimeout(() => {
-                espalhados.style.transition = 'opacity 0.5s';
+                espalhados.style.transition = 'opacity 0.8s, transform 0.8s';
                 espalhados.style.opacity = '0';
+                espalhados.style.transform = 'scale(0.5)';
                 
                 setTimeout(() => {
                     espalhados.style.display = 'none';
                     montada.style.display = 'block';
+                    montada.style.opacity = '0';
+                    montada.style.transition = 'opacity 0.5s';
                     
-                    // Rosa aparece depois de um tempo
                     setTimeout(() => {
-                        rosa.style.opacity = '1';
-                    }, 1500);
-                }, 500);
-            }, 1000);
+                        montada.style.opacity = '1';
+                        
+                        // Rosa aparece depois
+                        setTimeout(() => {
+                            rosa.classList.add('aparecendo');
+                        }, 1000);
+                    }, 100);
+                }, 800);
+            }, 1500);
         }
 
         function criarCoracoes() {
             const heart = document.createElement('div');
             heart.className = 'heart';
-            heart.innerHTML = ['💀', '💕', '💗', '💀', '🦴'][Math.floor(Math.random() * 5)];
+            heart.innerHTML = ['💀', '💕', '💗', '💖', '🦴', '✨'][Math.floor(Math.random() * 6)];
             heart.style.left = Math.random() * window.innerWidth + 'px';
             heart.style.top = '-50px';
             heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
@@ -438,8 +551,8 @@
             setTimeout(() => heart.remove(), 5000);
         }
 
-        // Criar corações caindo periodicamente
-        setInterval(criarCoracoes, 400);
+        // Criar elementos caindo
+        setInterval(criarCoracoes, 350);
 
         // Mover botão com mouse
         document.addEventListener('mousemove', (e) => {
@@ -453,10 +566,21 @@
             const distY = e.clientY - btnCenterY;
             const distancia = Math.sqrt(distX * distX + distY * distY);
             
-            if (distancia < 120) {
+            if (distancia < 130) {
                 fugir();
             }
         });
+
+        // Animação de acenar o braço
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes acena {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-10deg); }
+                75% { transform: rotate(10deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
