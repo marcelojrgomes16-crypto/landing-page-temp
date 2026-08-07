@@ -117,6 +117,37 @@
                 opacity: 0;
             }
         }
+
+        /* Pantera andando */
+        .pantera-container {
+            margin: 30px auto;
+            animation: walk 3s ease-in-out infinite;
+        }
+
+        .pantera {
+            display: inline-block;
+            animation: bounce 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes walk {
+            0%, 100% { transform: translateX(-20px); }
+            50% { transform: translateX(20px); }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        .buque {
+            animation: sway 1s ease-in-out infinite alternate;
+            transform-origin: 165px 95px;
+        }
+
+        @keyframes sway {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
     </style>
 </head>
 <body>
@@ -133,6 +164,63 @@
         <div class="coracoes-grandes">❤️💕❤️</div>
         <h2>EU SABIA! 💕</h2>
         <p style="color: white; font-size: 24px; margin-top: 20px;">Agora somos oficialmente um casal!</p>
+        
+        <!-- Pantera Cor de Rosa com buquê -->
+        <div class="pantera-container">
+            <div class="pantera">
+                <svg viewBox="0 0 200 180" width="200" height="180">
+                    <!-- Corpo -->
+                    <ellipse cx="100" cy="110" rx="50" ry="35" fill="#ff69b4"/>
+                    <!-- Cabeça -->
+                    <circle cx="150" cy="75" r="25" fill="#ff69b4"/>
+                    <!-- Orelhas -->
+                    <ellipse cx="138" cy="55" rx="8" ry="12" fill="#ff69b4"/>
+                    <ellipse cx="162" cy="55" rx="8" ry="12" fill="#ff69b4"/>
+                    <ellipse cx="138" cy="55" rx="5" ry="8" fill="#ffb6c1"/>
+                    <ellipse cx="162" cy="55" rx="5" ry="8" fill="#ffb6c1"/>
+                    <!-- Olhos -->
+                    <ellipse cx="142" cy="72" rx="5" ry="6" fill="white"/>
+                    <ellipse cx="158" cy="72" rx="5" ry="6" fill="white"/>
+                    <circle cx="143" cy="73" r="3" fill="#333"/>
+                    <circle cx="159" cy="73" r="3" fill="#333"/>
+                    <!-- Nariz -->
+                    <ellipse cx="150" cy="80" rx="4" ry="3" fill="#333"/>
+                    <!-- Boca -->
+                    <path d="M 145 85 Q 150 92 155 85" stroke="#333" stroke-width="2" fill="none"/>
+                    <!-- Bigodes -->
+                    <line x1="130" y1="78" x2="120" y2="75" stroke="#333" stroke-width="1.5"/>
+                    <line x1="130" y1="82" x2="118" y2="82" stroke="#333" stroke-width="1.5"/>
+                    <line x1="170" y1="78" x2="180" y2="75" stroke="#333" stroke-width="1.5"/>
+                    <line x1="170" y1="82" x2="182" y2="82" stroke="#333" stroke-width="1.5"/>
+                    <!-- Patas dianteiras -->
+                    <ellipse cx="75" cy="140" rx="12" ry="8" fill="#ff69b4"/>
+                    <ellipse cx="125" cy="140" rx="12" ry="8" fill="#ff69b4"/>
+                    <!-- Patas traseiras -->
+                    <ellipse cx="55" cy="135" rx="10" ry="7" fill="#ff69b4"/>
+                    <ellipse cx="145" cy="135" rx="10" ry="7" fill="#ff69b4"/>
+                    <!-- Cauda -->
+                    <path d="M 50 100 Q 20 90 30 120 Q 35 140 50 130" stroke="#ff69b4" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    <!-- Buquê de rosas (mão/pata da direita) -->
+                    <g class="buque">
+                        <!-- Caules -->
+                        <line x1="165" y1="95" x2="175" y2="60" stroke="#228B22" stroke-width="3"/>
+                        <line x1="165" y1="95" x2="185" y2="55" stroke="#228B22" stroke-width="3"/>
+                        <line x1="165" y1="95" x2="190" y2="65" stroke="#228B22" stroke-width="3"/>
+                        <!-- Rosas -->
+                        <circle cx="175" cy="55" r="8" fill="#ff1493"/>
+                        <circle cx="175" cy="55" r="5" fill="#ff69b4"/>
+                        <circle cx="185" cy="50" r="8" fill="#ff1493"/>
+                        <circle cx="185" cy="50" r="5" fill="#ff69b4"/>
+                        <circle cx="190" cy="60" r="8" fill="#ff1493"/>
+                        <circle cx="190" cy="60" r="5" fill="#ff69b4"/>
+                        <!-- Folhas -->
+                        <ellipse cx="170" cy="65" rx="5" ry="3" fill="#228B22" transform="rotate(-30 170 65)"/>
+                        <ellipse cx="180" cy="58" rx="5" ry="3" fill="#228B22" transform="rotate(20 180 58)"/>
+                    </g>
+                </svg>
+            </div>
+        </div>
+        
         <div class="coracoes-grandes">💕💕💕</div>
     </div>
 
