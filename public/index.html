@@ -3,53 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page</title>
+    <title>Para Myrella</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
-        
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 100px 20px;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #ff6b9d 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
-        
-        h1 { font-size: 48px; margin-bottom: 20px; }
-        p { font-size: 20px; margin-bottom: 40px; opacity: 0.9; }
-        
-        .cta-button {
-            background: white;
-            color: #667eea;
-            padding: 15px 40px;
-            border-radius: 30px;
-            text-decoration: none;
+
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 42px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .coracoes {
+            font-size: 40px;
+            margin-bottom: 30px;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .botoes {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 18px 50px;
+            font-size: 22px;
             font-weight: 700;
-            font-size: 18px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: fixed;
         }
-        
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+        .btn-sim {
+            background: #2ecc71;
+            color: white;
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
         }
-        
-        @media (max-width: 768px) {
-            h1 { font-size: 32px; }
-            p { font-size: 16px; }
+
+        .btn-sim:hover {
+            background: #27ae60;
+            transform: scale(1.1);
+        }
+
+        .btn-nao {
+            background: #e74c3c;
+            color: white;
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-nao:hover {
+            background: #c0392b;
+        }
+
+        /* Tela de sucesso */
+        .sucesso {
+            display: none;
+            text-align: center;
+        }
+
+        .sucesso h2 {
+            color: white;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .sucesso .coracoes-grandes {
+            font-size: 80px;
+            animation: float 1s infinite ease-in-out;
+        }
+
+        /* Corações caindo */
+        .heart {
+            position: fixed;
+            font-size: 24px;
+            animation: fall linear forwards;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>Sua Landing Page</h1>
-        <p>Edite este arquivo para personalizar sua página</p>
-        <a href="#contato" class="cta-button">Saiba Mais</a>
+    <div class="container" id="pergunta">
+        <div class="coracoes">💕💕💕</div>
+        <h1>Myrella, quer ser minha?</h1>
+        <div class="botoes">
+            <button class="btn btn-sim" onclick="responderSim()">Sim 💕</button>
+            <button class="btn btn-nao" id="btnNao" onmouseenter="fugir()" onclick="fugir()">Não 😢</button>
+        </div>
     </div>
+
+    <div class="sucesso" id="sucesso">
+        <div class="coracoes-grandes">❤️💕❤️</div>
+        <h2>EU SABIA! 💕</h2>
+        <p style="color: white; font-size: 24px; margin-top: 20px;">Agora somos oficialmente um casal!</p>
+        <div class="coracoes-grandes">💕💕💕</div>
+    </div>
+
+    <script>
+        let cliqueCount = 0;
+        const btnNao = document.getElementById('btnNao');
+
+        function fugir() {
+            cliqueCount++;
+            
+            const larguraTela = window.innerWidth;
+            const alturaTela = window.innerHeight;
+            
+            const novaX = Math.random() * (larguraTela - 150);
+            const novaY = Math.random() * (alturaTela - 60);
+            
+            btnNao.style.left = novaX + 'px';
+            btnNao.style.top = novaY + 'px';
+            btnNao.style.position = 'fixed';
+            
+            // Fica menor a cada clique
+            const tamanho = Math.max(12, 22 - cliqueCount * 2);
+            btnNao.style.fontSize = tamanho + 'px';
+            btnNao.style.padding = (18 - cliqueCount) + 'px ' + (50 - cliqueCount * 3) + 'px';
+            
+            // Texto muda
+            const textos = ['Não 😢', 'Ah não...', 'Por favor!', 'Não fui...', 'Tá bom 😭', 'Sem chance!', 'Esquece...'];
+            btnNao.textContent = textos[Math.min(cliqueCount, textos.length - 1)];
+        }
+
+        function responderSim() {
+            document.getElementById('pergunta').style.display = 'none';
+            document.getElementById('sucesso').style.display = 'block';
+            criarCoracoes();
+        }
+
+        function criarCoracoes() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = ['❤️', '💕', '💗', '💖', '💘'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.top = '-50px';
+            heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 5000);
+        }
+
+        // Criar corações caindo periodicamente
+        setInterval(criarCoracoes, 300);
+
+        // Mover botão com mouse
+        document.addEventListener('mousemove', (e) => {
+            const btnRect = btnNao.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+            
+            const distX = e.clientX - btnCenterX;
+            const distY = e.clientY - btnCenterY;
+            const distancia = Math.sqrt(distX * distX + distY * distY);
+            
+            if (distancia < 150 && btnNao.style.position === 'fixed') {
+                fugir();
+            }
+        });
+    </script>
 </body>
 </html>
