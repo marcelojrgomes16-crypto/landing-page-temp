@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: landing-page-temp
+    env: node
+    region: sao-paulo
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
