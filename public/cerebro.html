@@ -61,6 +61,13 @@ canvas { display: block; }
   position: absolute; top: 12px; right: 16px; background: none; border: none;
   color: #556; font-size: 1.5rem; cursor: pointer;
 }
+.modal-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+#modal-close-btn {
+  padding: 10px 28px; background: transparent; border: 1px solid rgba(255,255,255,0.2);
+  color: #8899aa; border-radius: 8px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-size: 0.9rem;
+}
+#modal-close-btn:hover { border-color: #ff5555; color: #ff5555; }
 </style>
 </head>
 <body>
@@ -81,7 +88,10 @@ canvas { display: block; }
     <div class="modal-emoji" id="modal-emoji"></div>
     <h2 id="modal-title"></h2>
     <p id="modal-desc"></p>
-    <a id="modal-link" href="#" target="_blank">Acessar</a>
+    <div class="modal-buttons">
+      <a id="modal-link" href="#" target="_blank">🔗 Abrir Projeto</a>
+      <button id="modal-close-btn">✕ Fechar</button>
+    </div>
   </div>
 </div>
 
@@ -106,6 +116,7 @@ updateClock(); setInterval(updateClock, 1000);
 // Modal
 const overlay = document.getElementById('modal-overlay');
 document.getElementById('modal-close').onclick = () => overlay.classList.remove('active');
+document.getElementById('modal-close-btn').onclick = () => overlay.classList.remove('active');
 overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('active'); };
 
 function openModal(p) {
@@ -359,7 +370,7 @@ PROJECTS.forEach((p, i) => {
 let isDragging = false;
 let prevMouse = { x: 0, y: 0 };
 let rotVel = { x: 0, y: 0 };
-const autoRotateSpeed = 0.0001;
+const autoRotateSpeed = 0.00005;
 
 renderer.domElement.addEventListener('mousedown', (e) => {
   isDragging = true;
