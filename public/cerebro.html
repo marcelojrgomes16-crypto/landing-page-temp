@@ -154,14 +154,13 @@ function openModal(p) {
     });
   };
 
-  // CMD button - copia comando para abrir CMD no diretorio
+  // CMD button - copia e abre via protocolo
   document.getElementById('modal-cmd').onclick = () => {
-    const cmd = `cd /d "${p.dir}"`;
-    const fullCmd = `cd /d "${p.dir}" && code "${p.file}"`;
-    navigator.clipboard.writeText(fullCmd).then(() => {
+    const cmd = `cd /d "${p.dir}" && code "${p.file}"`;
+    navigator.clipboard.writeText(cmd).then(() => {
       const msg = document.getElementById('modal-cmd-msg');
       msg.style.display = 'block';
-      msg.innerHTML = '📋 Comando copiado! Abra o <b>CMD</b> e cole:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + fullCmd + '</code><br><br>Ou apenas navegue até a pasta:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + cmd + '</code>';
+      msg.innerHTML = '✅ Comando copiado! Pressione <b style="color:#ff5555;">Win+R</b> → digite <b style="color:#ff5555;">cmd</b> → <b style="color:#ff5555;">Enter</b> → cole com <b style="color:#ff5555;">Ctrl+V</b>:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:3px;display:inline-block;margin-top:6px;">' + cmd + '</code>';
     });
   };
 
