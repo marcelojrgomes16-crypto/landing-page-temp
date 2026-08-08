@@ -68,6 +68,21 @@ canvas { display: block; }
   transition: all 0.2s; font-size: 0.9rem;
 }
 #modal-close-btn:hover { border-color: #ff5555; color: #ff5555; }
+#modal-vscode {
+  padding: 10px 28px; background: linear-gradient(135deg, #007acc, #1e90ff);
+  color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-size: 0.9rem; text-decoration: none; display: inline-block;
+}
+#modal-vscode:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,122,204,0.4); }
+#modal-cmd {
+  padding: 10px 28px; background: transparent; border: 1px solid rgba(0,229,255,0.3);
+  color: #00e5ff; border-radius: 8px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-size: 0.9rem;
+}
+#modal-cmd:hover { border-color: #00e5ff; background: rgba(0,229,255,0.1); }
+#modal-cmd-msg { color: #00e5ff; font-size: 0.8rem; margin-top: 12px; word-break: break-all;
+  background: rgba(0,229,255,0.05); padding: 8px 12px; border-radius: 6px;
+  border: 1px solid rgba(0,229,255,0.15); }
 </style>
 </head>
 <body>
@@ -89,21 +104,24 @@ canvas { display: block; }
     <h2 id="modal-title"></h2>
     <p id="modal-desc"></p>
     <div class="modal-buttons">
-      <a id="modal-link" href="#" target="_blank">🔗 Abrir Projeto</a>
+      <a id="modal-link" href="#" target="_blank">🔗 Abrir no Navegador</a>
+      <button id="modal-vscode">💻 Abrir no VS Code</button>
+      <button id="modal-cmd">⌨️ Copiar Caminho</button>
       <button id="modal-close-btn">✕ Fechar</button>
     </div>
+    <p id="modal-cmd-msg" style="display:none;color:#00e5ff;font-size:0.8rem;margin-top:12px;word-break:break-all;"></p>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const PROJECTS = [
-  { emoji:'🍷', name:'Adega To Chegando', desc:'Sistema de controle de estoque para distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/' },
-  { emoji:'💕', name:'Para Myrella', desc:'Landing page personalizada com design moderno e interativo.', url:'https://landing-page-temp.onrender.com/' },
-  { emoji:'🧬', name:'Biomedicina', desc:'Plataforma de informações e serviços de biomedicina.', url:'https://landing-page-temp.onrender.com/' },
-  { emoji:'📦', name:'Controle de Estoque', desc:'Módulo de gestão de estoque para consumidor final.', url:'https://estoque-distribuidora-th3q.onrender.com/consumidor.html' },
-  { emoji:'⚡', name:'API REST', desc:'Endpoint de health check e serviços RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health' },
-  { emoji:'🚀', name:'Deploy', desc:'Plataforma de deploy e hospedagem de aplicações.', url:'https://render.com' }
+  { emoji:'🍷', name:'Adega To Chegando', desc:'Sistema de controle de estoque para distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js' },
+  { emoji:'💕', name:'Para Myrella', desc:'Landing page personalizada com design moderno e interativo.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html' },
+  { emoji:'🧬', name:'Biomedicina', desc:'Plataforma de informações e serviços de biomedicina.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html' },
+  { emoji:'📦', name:'Controle de Estoque', desc:'Módulo de gestão de estoque para consumidor final.', url:'https://estoque-distribuidora-th3q.onrender.com/consumidor.html', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'public\\consumidor.html' },
+  { emoji:'⚡', name:'API REST', desc:'Endpoint de health check e serviços RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js' },
+  { emoji:'🚀', name:'Deploy', desc:'Plataforma de deploy e hospedagem de aplicações.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml' }
 ];
 
 // Clock
@@ -124,6 +142,28 @@ function openModal(p) {
   document.getElementById('modal-title').textContent = p.name;
   document.getElementById('modal-desc').textContent = p.desc;
   document.getElementById('modal-link').href = p.url;
+  document.getElementById('modal-cmd-msg').style.display = 'none';
+
+  // VS Code button
+  document.getElementById('modal-vscode').onclick = () => {
+    const cmd = `code "${p.dir}"`;
+    navigator.clipboard.writeText(cmd).then(() => {
+      const msg = document.getElementById('modal-cmd-msg');
+      msg.style.display = 'block';
+      msg.innerHTML = '📋 Comando copiado! Cole no terminal:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + cmd + '</code>';
+    });
+  };
+
+  // CMD button
+  document.getElementById('modal-cmd').onclick = () => {
+    const cmd = `cd "${p.dir}" && code "${p.file}"`;
+    navigator.clipboard.writeText(cmd).then(() => {
+      const msg = document.getElementById('modal-cmd-msg');
+      msg.style.display = 'block';
+      msg.innerHTML = '📋 Caminho copiado! Para abrir no VS Code, cole no terminal:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + cmd + '</code><br><br>Ou abra o CMD e cole:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">cd "' + p.dir + '"</code>';
+    });
+  };
+
   overlay.classList.add('active');
 }
 
