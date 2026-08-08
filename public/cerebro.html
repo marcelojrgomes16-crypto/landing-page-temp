@@ -18,6 +18,19 @@
   .tooltip h3{font-size:1rem;color:#00e5ff;margin-bottom:4px;font-weight:500}
   .tooltip p{font-size:.78rem;color:#00e5ffaa;line-height:1.4}
   .tooltip a{color:#00e5ff;text-decoration:underline;font-size:.72rem}
+  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:200;display:none;justify-content:center;align-items:center;backdrop-filter:blur(8px);opacity:0;transition:opacity .3s}
+  .modal-overlay.active{display:flex;opacity:1}
+  .modal{background:linear-gradient(135deg,#0a1628,#0d1f3c);border:1px solid #00e5ff44;border-radius:16px;padding:30px;max-width:400px;width:90%;text-align:center;box-shadow:0 0 60px #00e5ff33;transform:scale(.9);transition:transform .3s}
+  .modal-overlay.active .modal{transform:scale(1)}
+  .modal-emoji{font-size:3rem;margin-bottom:10px}
+  .modal h2{color:#00e5ff;font-size:1.3rem;margin-bottom:8px;font-weight:500}
+  .modal p{color:#00e5ffaa;font-size:.85rem;line-height:1.5;margin-bottom:20px}
+  .modal-buttons{display:flex;gap:12px;justify-content:center}
+  .modal-btn{padding:10px 24px;border-radius:8px;border:none;font-size:.9rem;cursor:pointer;font-weight:600;transition:all .2s}
+  .modal-btn.primary{background:#00e5ff;color:#0a0a12;box-shadow:0 0 20px #00e5ff55}
+  .modal-btn.primary:hover{background:#33ecff;box-shadow:0 0 30px #00e5ffaa}
+  .modal-btn.secondary{background:transparent;color:#00e5ff;border:1px solid #00e5ff55}
+  .modal-btn.secondary:hover{background:#00e5ff15}
 </style>
 </head>
 <body>
@@ -30,6 +43,17 @@
   <h3 id="tt-title"></h3>
   <p id="tt-desc"></p>
   <a id="tt-link" href="#" target="_blank">Acessar projeto</a>
+</div>
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-emoji" id="modal-emoji"></div>
+    <h2 id="modal-title"></h2>
+    <p id="modal-desc"></p>
+    <div class="modal-buttons">
+      <a class="modal-btn primary" id="modal-acessar" href="#" target="_blank">Acessar</a>
+      <button class="modal-btn secondary" id="modal-fechar">Fechar</button>
+    </div>
+  </div>
 </div>
 <div class="status-bar">
   <div><span class="status-dot"></span>SISTEMA ONLINE — TODOS OS MÓDULOS OPERACIONAIS</div>
@@ -407,6 +431,37 @@
   canvas.addEventListener('mouseup',()=>{isDragging=false});
   canvas.addEventListener('mouseleave',()=>{isDragging=false;hideTooltip()});
 
+  // Click to open modal
+  let mouseDownPos={x:0,y:0};
+  canvas.addEventListener('mousedown',e=>{mouseDownPos={x:e.clientX,y:e.clientY}});
+  canvas.addEventListener('click',e=>{
+    if(Math.abs(e.clientX-mouseDownPos.x)>5||Math.abs(e.clientY-mouseDownPos.y)>5)return;
+    mouse.x=(e.clientX/W())*2-1;
+    mouse.y=-(e.clientY/H())*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    let closest=null;
+    let closestDist=Infinity;
+    projectNodes.forEach(node=>{
+      const sphere=node.userData.sphere;
+      const worldPos=new THREE.Vector3();
+      sphere.getWorldPosition(worldPos);
+      const dist=raycaster.ray.distanceToPoint(worldPos);
+      if(dist<0.8&&dist<closestDist){
+        closestDist=dist;
+        closest=node;
+      }
+    });
+    if(closest){
+      const p=closest.userData.proj;
+      document.getElementById('modal-emoji').textContent=p.emoji;
+      document.getElementById('modal-title').textContent=p.name;
+      document.getElementById('modal-desc').textContent=p.desc;
+      document.getElementById('modal-acessar').href=p.url;
+      document.getElementById('modal').classList.add('active');
+      hideTooltip();
+    }
+  });
+
   // Touch support
   canvas.addEventListener('touchstart',e=>{
     isDragging=true;
@@ -487,6 +542,16 @@
   }
   setInterval(updateClock,1000);
   updateClock();
+
+  // --- MODAL ---
+  document.getElementById('modal-fechar').addEventListener('click',()=>{
+    document.getElementById('modal').classList.remove('active');
+  });
+  document.getElementById('modal').addEventListener('click',e=>{
+    if(e.target===document.getElementById('modal')){
+      document.getElementById('modal').classList.remove('active');
+    }
+  });
 
   // --- ANIMATION LOOP ---
   const clock=new THREE.Clock();
