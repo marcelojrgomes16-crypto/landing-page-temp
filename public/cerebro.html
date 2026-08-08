@@ -211,11 +211,11 @@ projects.forEach((proj,i)=>{
   group.userData={project:proj,index:i};
 
   // Node sphere
-  const geo=new THREE.SphereGeometry(.4,16,16);
+  const geo=new THREE.SphereGeometry(.6,16,16);
   const mat=new THREE.MeshStandardMaterial({
     color:0x00e5ff,
     emissive:0x00e5ff,
-    emissiveIntensity:.6,
+    emissiveIntensity:.8,
     metalness:.9,
     roughness:.1,
     transparent:true,
@@ -226,10 +226,31 @@ projects.forEach((proj,i)=>{
 
   // Node glow
   const nGlow=new THREE.Mesh(
-    new THREE.SphereGeometry(.8,16,16),
-    new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.15})
+    new THREE.SphereGeometry(1.2,16,16),
+    new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.2})
   );
   group.add(nGlow);
+
+  // Emoji label
+  const labelCanvas=document.createElement("canvas");
+  labelCanvas.width=256;
+  labelCanvas.height=128;
+  const ctx=labelCanvas.getContext("2d");
+  ctx.clearRect(0,0,256,128);
+  ctx.font="bold 60px Segoe UI Emoji, Arial";
+  ctx.textAlign="center";
+  ctx.fillStyle="#00e5ff";
+  ctx.shadowColor="#00e5ff";
+  ctx.shadowBlur=20;
+  ctx.fillText(proj.icon,128,70);
+  ctx.font="bold 28px Segoe UI, Arial";
+  ctx.fillText(proj.name,128,115);
+  const tex=new THREE.CanvasTexture(labelCanvas);
+  const spriteMat=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:1});
+  const sprite=new THREE.Sprite(spriteMat);
+  sprite.scale.set(5,2.5,1);
+  sprite.position.y=2;
+  group.add(sprite);
 
   // Connecting line to center
   const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),group.position.clone().negate()]);
@@ -307,6 +328,15 @@ function onClick(e){
     const node=obj.parent;
     if(node.userData.project){
       showModal(node.userData.project);
+    }
+  }else{
+    const allSpheres=nodeMeshes.map(g=>g.children[1]);
+    const hit=raycaster.intersectObjects(allSpheres,false);
+    if(hit.length>0){
+      const node=hit[0].object.parent;
+      if(node.userData.project){
+        showModal(node.userData.project);
+      }
     }
   }
 }
