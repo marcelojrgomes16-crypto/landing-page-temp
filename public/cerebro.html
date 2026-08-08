@@ -154,13 +154,22 @@ function openModal(p) {
     });
   };
 
-  // CMD button - copia e abre via protocolo
+  // CMD button - abre CMD via servidor local
   document.getElementById('modal-cmd').onclick = () => {
-    const cmd = `cd /d "${p.dir}" && code "${p.file}"`;
-    navigator.clipboard.writeText(cmd).then(() => {
+    fetch('http://localhost:3099/open-cmd', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dir: p.dir, file: p.file })
+    }).then(r => r.json()).then(data => {
+      if (data.ok) {
+        const msg = document.getElementById('modal-cmd-msg');
+        msg.style.display = 'block';
+        msg.innerHTML = '✅ CMD aberto em: <code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + p.dir + '</code>';
+      }
+    }).catch(() => {
       const msg = document.getElementById('modal-cmd-msg');
       msg.style.display = 'block';
-      msg.innerHTML = '✅ Comando copiado! Pressione <b style="color:#ff5555;">Win+R</b> → digite <b style="color:#ff5555;">cmd</b> → <b style="color:#ff5555;">Enter</b> → cole com <b style="color:#ff5555;">Ctrl+V</b>:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:3px;display:inline-block;margin-top:6px;">' + cmd + '</code>';
+      msg.innerHTML = '⚠️ Execute o helper primeiro: <code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">node cmd-helper.js</code>';
     });
   };
 
