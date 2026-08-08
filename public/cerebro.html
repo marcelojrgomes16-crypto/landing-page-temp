@@ -35,6 +35,189 @@ canvas { display: block; }
   font-size: 0.75rem; color: rgba(255,255,255,0.25); z-index: 10; pointer-events: none;
 }
 
+#skeleton-walker {
+  position: fixed;
+  bottom: 45px;
+  z-index: 100;
+  pointer-events: none;
+  animation: skeletonWalkBack 12s linear infinite;
+}
+@keyframes skeletonWalkBack {
+  0% { left: -120px; transform: scaleX(1); }
+  49.9% { left: calc(100% + 120px); transform: scaleX(1); }
+  50% { left: calc(100% + 120px); transform: scaleX(-1); }
+  99.9% { left: -120px; transform: scaleX(-1); }
+  100% { left: -120px; transform: scaleX(1); }
+}
+.skeleton {
+  position: relative;
+  width: 60px;
+  height: 140px;
+}
+.skel-head {
+  position: absolute;
+  width: 32px;
+  height: 36px;
+  background: #f5f5dc;
+  border-radius: 50% 50% 45% 45%;
+  left: 14px;
+  top: 0;
+  z-index: 2;
+}
+.skel-head::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 50%;
+  top: 14px;
+  left: 6px;
+  box-shadow: 12px 0 0 #1a1a1a;
+}
+.skel-head::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 4px;
+  background: #1a1a1a;
+  border-radius: 0 0 6px 6px;
+  bottom: 8px;
+  left: 10px;
+}
+.skel-jaw {
+  position: absolute;
+  width: 24px;
+  height: 10px;
+  background: #e8e8d0;
+  border-radius: 0 0 12px 12px;
+  left: 19px;
+  top: 32px;
+  transform-origin: top center;
+  animation: jawMove 0.5s ease-in-out infinite;
+}
+@keyframes jawMove {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+}
+.skel-neck {
+  position: absolute;
+  width: 6px;
+  height: 12px;
+  background: #e8e8d0;
+  left: 27px;
+  top: 34px;
+  border-radius: 3px;
+}
+.skel-torso {
+  position: absolute;
+  width: 28px;
+  height: 35px;
+  background: #f5f5dc;
+  border-radius: 8px 8px 4px 4px;
+  left: 16px;
+  top: 44px;
+}
+.skel-ribs {
+  position: absolute;
+  width: 24px;
+  height: 20px;
+  border: 2px solid #d4d4c0;
+  border-radius: 0 0 12px 12px;
+  left: 18px;
+  top: 48px;
+  background: transparent;
+}
+.skel-ribs::before, .skel-ribs::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #d4d4c0;
+  left: -2px;
+}
+.skel-ribs::before { top: 6px; }
+.skel-ribs::after { top: 12px; }
+.skel-arm {
+  position: absolute;
+  width: 8px;
+  height: 45px;
+  background: #e8e8d0;
+  border-radius: 4px;
+  left: 6px;
+  top: 46px;
+  transform-origin: top center;
+  animation: armSwingReal 0.4s ease-in-out infinite;
+}
+.skel-arm.right {
+  left: 46px;
+  animation-delay: 0.2s;
+}
+@keyframes armSwingReal {
+  0%, 100% { transform: rotate(20deg); }
+  50% { transform: rotate(-20deg); }
+}
+.skel-hand {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #f5f5dc;
+  border-radius: 50%;
+  bottom: -4px;
+  left: 0;
+}
+.skel-pelvis {
+  position: absolute;
+  width: 24px;
+  height: 12px;
+  background: #e8e8d0;
+  border-radius: 4px 4px 8px 8px;
+  left: 18px;
+  top: 76px;
+}
+.skel-leg {
+  position: absolute;
+  width: 10px;
+  height: 50px;
+  background: #f5f5dc;
+  border-radius: 5px;
+  left: 16px;
+  top: 86px;
+  transform-origin: top center;
+  animation: legWalkReal 0.4s ease-in-out infinite;
+}
+.skel-leg.right {
+  left: 34px;
+  animation-delay: 0.2s;
+}
+@keyframes legWalkReal {
+  0%, 100% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+}
+.skel-foot {
+  position: absolute;
+  width: 14px;
+  height: 6px;
+  background: #e8e8d0;
+  border-radius: 3px;
+  bottom: -4px;
+  left: -2px;
+}
+.skel-shadow {
+  position: absolute;
+  width: 50px;
+  height: 10px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 50%;
+  bottom: -15px;
+  left: 5px;
+  animation: shadowPulse 0.4s ease-in-out infinite;
+}
+@keyframes shadowPulse {
+  0%, 100% { transform: scaleX(1); opacity: 0.3; }
+  50% { transform: scaleX(0.8); opacity: 0.5; }
+}
+
 #modal-overlay {
   display: none; position: fixed; inset: 0; z-index: 100;
   background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
@@ -91,6 +274,30 @@ canvas { display: block; }
 
 <div id="instructions">Arraste para girar &bull; Clique nos nós para acessar</div>
 
+<div id="skeleton-walker">
+  <div class="skeleton">
+    <div class="skel-head"></div>
+    <div class="skel-jaw"></div>
+    <div class="skel-neck"></div>
+    <div class="skel-torso"></div>
+    <div class="skel-ribs"></div>
+    <div class="skel-arm left">
+      <div class="skel-hand"></div>
+    </div>
+    <div class="skel-arm right">
+      <div class="skel-hand"></div>
+    </div>
+    <div class="skel-pelvis"></div>
+    <div class="skel-leg left">
+      <div class="skel-foot"></div>
+    </div>
+    <div class="skel-leg right">
+      <div class="skel-foot"></div>
+    </div>
+    <div class="skel-shadow"></div>
+  </div>
+</div>
+
 <div id="status-bar">
   <span><span class="status-dot"></span>Sistema Online</span>
   <span>6 Projetos Ativos</span>
@@ -130,6 +337,8 @@ function updateClock() {
   document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR');
 }
 updateClock(); setInterval(updateClock, 1000);
+
+
 
 // Modal
 const overlay = document.getElementById('modal-overlay');
