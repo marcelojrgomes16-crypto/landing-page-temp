@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cérebro Digital - Projetos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            color: #00d4ff;
+        }
+
+        h1 {
+            position: fixed;
+            top: 20px;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+            animation: pulse 2s infinite;
+            z-index: 100;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(0, 212, 255, 0.8); }
+            50% { opacity: 0.8; text-shadow: 0 0 40px rgba(0, 212, 255, 1); }
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 30px;
+            font-size: 14px;
+            color: #00d4ff;
+            opacity: 0.7;
+            letter-spacing: 3px;
+            animation: pisca 2s infinite;
+        }
+
+        @keyframes pisca {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Container do cérebro */
+        .brain-container {
+            position: relative;
+            width: 600px;
+            height: 500px;
+            perspective: 1000px;
+            cursor: grab;
+        }
+
+        .brain-container:active {
+            cursor: grabbing;
+        }
+
+        /* Cérebro 3D */
+        .brain {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* SVG do cérebro */
+        .brain-svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.5));
+        }
+
+        /* Circuits animados */
+        .circuit {
+            position: absolute;
+            stroke: #00d4ff;
+            stroke-width: 1.5;
+            fill: none;
+            opacity: 0.6;
+            stroke-dasharray: 10 5;
+            animation: circuitFlow 3s linear infinite;
+        }
+
+        @keyframes circuitFlow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -30; }
+        }
+
+        /* Nós de circuito (pontos brilhantes) */
+        .circuit-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #00d4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00d4ff, 0 0 30px #00d4ff;
+            animation: nodeGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes nodeGlow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        /* Projetos no cérebro */
+        .project-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: nodeFloat 3s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .project-node:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 30px #00d4ff, 0 0 60px #00d4ff;
+            z-index: 20;
+        }
+
+        .project-node::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @keyframes nodeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Tooltip do projeto */
+        .project-tooltip {
+            position: absolute;
+            background: rgba(0, 20, 40, 0.95);
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            padding: 15px 20px;
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .project-tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .project-tooltip h3 {
+            color: #00d4ff;
+            font-size: 16px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .project-tooltip p {
+            color: #88ccff;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .project-tooltip .url {
+            color: #00ff88;
+            font-size: 11px;
+            word-break: break-all;
+        }
+
+        .project-tooltip a {
+            color: #00ff88;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .project-tooltip a:hover {
+            color: #00ffaa;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        /* Centro brilhante */
+        .brain-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
+            border-radius: 50%;
+            animation: corePulse 2s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px #00d4ff; }
+            50% { transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 60px #00d4ff, 0 0 100px #00d4ff; }
+        }
+
+        /* Partículas flutuantes */
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00d4ff;
+            border-radius: 50%;
+            animation: particleFloat 5s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Linhas de conexão */
+        .connection-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            transform-origin: left center;
+            opacity: 0.3;
+            animation: linePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Status bar */
+        .status-bar {
+            position: fixed;
+            bottom: 60px;
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #00d4ff;
+            opacity: 0.6;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: dotBlink 1s infinite;
+        }
+
+        @keyframes dotBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Ângulo de rotação */
+        .rotation-info {
+            position: fixed;
+            top: 70px;
+            font-size: 12px;
+            color: #00d4ff;
+            opacity: 0.5;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Cérebro Digital</h1>
+    
+    <div class="rotation-info" id="rotationInfo">ROTAÇÃO: 0° | 0°</div>
+    
+    <div class="brain-container" id="brainContainer">
+        <div class="brain" id="brain">
+            <!-- SVG do cérebro com circuitos -->
+            <svg class="brain-svg" viewBox="0 0 600 500">
+                <!-- Forma do cérebro -->
+                <defs>
+                    <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1a3a4a;stop-opacity:0.8" />
+                        <stop offset="50%" style="stop-color:#0d253a;stop-opacity:0.9" />
+                        <stop offset="100%" style="stop-color:#1a3a4a;stop-opacity:0.8" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <!-- Cérebro esquerdo -->
+                <path d="M 300 80 
+                         C 220 80, 150 120, 130 180 
+                         C 110 240, 100 300, 130 360 
+                         C 160 420, 220 450, 300 450" 
+                      fill="url(#brainGrad)" stroke="#00d4ff" stroke-width="2" filter="url(#glow)"/>
+                
+                <!-- Cérebro direito -->
+                <path d="M 300 80 
+                         C 380 80, 450 120, 470 180 
+                         C 490 240, 500 300, 470 360 
+                         C 440 420, 380 450, 300 450" 
+                      fill="url(#brainGrad)" stroke="#00d4ff" stroke-width="2" filter="url(#glow)"/>
+                
+                <!-- Sulcos do cérebro -->
+                <path class="circuit" d="M 200 150 Q 250 180 200 220 Q 150 260 200 300"/>
+                <path class="circuit" d="M 400 150 Q 350 180 400 220 Q 450 260 400 300"/>
+                <path class="circuit" d="M 250 120 Q 300 150 250 200 Q 200 250 250 300 Q 300 350 250 400"/>
+                <path class="circuit" d="M 350 120 Q 300 150 350 200 Q 400 250 350 300 Q 300 350 350 400"/>
+                
+                <!-- Circuitos internos -->
+                <path class="circuit" d="M 180 200 L 220 200 L 220 250 L 280 250" style="animation-delay: 0.5s"/>
+                <path class="circuit" d="M 420 200 L 380 200 L 380 250 L 320 250" style="animation-delay: 1s"/>
+                <path class="circuit" d="M 200 320 L 260 320 L 260 280 L 300 280" style="animation-delay: 1.5s"/>
+                <path class="circuit" d="M 400 320 L 340 320 L 340 280 L 300 280" style="animation-delay: 2s"/>
+                
+                <!-- Nós de circuito -->
+                <circle cx="200" cy="200" r="4" fill="#00d4ff" filter="url(#glow)">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="400" cy="200" r="4" fill="#00d4ff" filter="url(#glow)">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+                </circle>
+                <circle cx="220" cy="250" r="4" fill="#00d4ff" filter="url(#glow)">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="1s"/>
+                </circle>
+                <circle cx="380" cy="250" r="4" fill="#00d4ff" filter="url(#glow)">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="1.5s"/>
+                </circle>
+                <circle cx="260" cy="320" r="4" fill="#00d4ff" filter="url(#glow)">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+                </circle>
+                <circle cx="340" cy="320" r="4" fill="#00d4ff" filter="url(#glow)">
+                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.8s"/>
+                </circle>
+            </svg>
+            
+            <!-- Centro brilhante -->
+            <div class="brain-core"></div>
+            
+            <!-- Nós dos projetos -->
+            <div class="project-node" style="top: 25%; left: 15%;" 
+                 data-project="adega" onmouseenter="showProject(event, 'adega')" onmouseleave="hideProject()">
+                🍷
+            </div>
+            
+            <div class="project-node" style="top: 20%; right: 15%;" 
+                 data-project="myrella" onmouseenter="showProject(event, 'myrella')" onmouseleave="hideProject()">
+                💕
+            </div>
+            
+            <div class="project-node" style="top: 55%; left: 10%;" 
+                 data-project="bio" onmouseenter="showProject(event, 'bio')" onmouseleave="hideProject()">
+                🧬
+            </div>
+            
+            <div class="project-node" style="top: 60%; right: 10%;" 
+                 data-project="estoque" onmouseenter="showProject(event, 'estoque')" onmouseleave="hideProject()">
+                📦
+            </div>
+            
+            <div class="project-node" style="top: 40%; left: 25%;" 
+                 data-project="api" onmouseenter="showProject(event, 'api')" onmouseleave="hideProject()">
+                ⚡
+            </div>
+            
+            <div class="project-node" style="top: 45%; right: 25%;" 
+                 data-project="deploy" onmouseenter="showProject(event, 'deploy')" onmouseleave="hideProject()">
+                🚀
+            </div>
+        </div>
+        
+        <!-- Tooltip -->
+        <div class="project-tooltip" id="tooltip"></div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-dot"></div>
+            <span>SISTEMA ONLINE</span>
+        </div>
+        <div class="status-item">
+            <div class="status-dot" style="background: #00d4ff;"></div>
+            <span>6 PROJETOS ATIVOS</span>
+        </div>
+        <div class="status-item">
+            <div class="status-dot" style="background: #ff00ff;"></div>
+            <span>MEMÓRIA: 100%</span>
+        </div>
+    </div>
+    
+    <div class="instructions">↔ ARRASTE PARA ROTACIONAR ↔</div>
+    
+    <!-- Partículas -->
+    <div id="particles"></div>
+
+    <script>
+        // Dados dos projetos
+        const projects = {
+            adega: {
+                name: "Adega To Chegando",
+                description: "Sistema de estoque e pedidos online para adega de bebidas com PostgreSQL.",
+                url: "https://estoque-distribuidora-th3q.onrender.com/",
+                tech: "Node.js | Express 5 | PostgreSQL",
+                icon: "🍷"
+            },
+            myrella: {
+                name: "Para Myrella",
+                description: "Landing page romântica com tema de biomedicina e DNA animado.",
+                url: "https://landing-page-temp.onrender.com/",
+                tech: "HTML | CSS | SVG Animado",
+                icon: "💕"
+            },
+            bio: {
+                name: "Biomedicina",
+                description: "Módulo de biomedicina com DNA dupla hélice e células animadas.",
+                url: "https://landing-page-temp.onrender.com/",
+                tech: "SVG | Animações CSS",
+                icon: "🧬"
+            },
+            estoque: {
+                name: "Controle de Estoque",
+                description: "Sistema completo com 12 produtos, imagens reais e carrinho.",
+                url: "https://estoque-distribuidora-th3q.onrender.com/consumidor.html",
+                tech: "JavaScript | LocalStorage | API REST",
+                icon: "📦"
+            },
+            api: {
+                name: "API REST",
+                description: "Backend com Express 5, autenticação JWT e rotas públicas.",
+                url: "https://estoque-distribuidora-th3q.onrender.com/api/health",
+                tech: "Node.js | Express | JWT",
+                icon: "⚡"
+            },
+            deploy: {
+                name: "Deploy Automático",
+                description: "Deploy contínuo via GitHub + Render com auto-build.",
+                url: "https://render.com",
+                tech: "Git | GitHub | Render",
+                icon: "🚀"
+            }
+        };
+
+        // Controle de rotação
+        let isDragging = false;
+        let startX, startY;
+        let rotateX = 0, rotateY = 0;
+        const brain = document.getElementById('brain');
+        const container = document.getElementById('brainContainer');
+        const rotationInfo = document.getElementById('rotationInfo');
+        const tooltip = document.getElementById('tooltip');
+
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            container.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            rotateY += deltaX * 0.5;
+            rotateX -= deltaY * 0.5;
+            
+            // Limitar rotação
+            rotateX = Math.max(-30, Math.min(30, rotateX));
+            
+            brain.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            
+            rotationInfo.textContent = `ROTAÇÃO: ${Math.round(rotateX)}° | ${Math.round(rotateY)}°`;
+            
+            startX = e.clientX;
+            startY = e.clientY;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            container.style.cursor = 'grab';
+        });
+
+        // Touch support
+        container.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.touches[0].clientX - startX;
+            const deltaY = e.touches[0].clientY - startY;
+            
+            rotateY += deltaX * 0.5;
+            rotateX -= deltaY * 0.5;
+            
+            rotateX = Math.max(-30, Math.min(30, rotateX));
+            
+            brain.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            
+            rotationInfo.textContent = `ROTAÇÃO: ${Math.round(rotateX)}° | ${Math.round(rotateY)}°`;
+            
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Mostrar projeto
+        function showProject(e, projectId) {
+            const project = projects[projectId];
+            const rect = e.target.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            tooltip.innerHTML = `
+                <h3>${project.icon} ${project.name}</h3>
+                <p>${project.description}</p>
+                <p style="font-size: 11px; color: #00d4ff;">${project.tech}</p>
+                <div class="url">
+                    <a href="${project.url}" target="_blank">${project.url}</a>
+                </div>
+            `;
+            
+            // Posicionar tooltip
+            let left = rect.left - containerRect.left + 70;
+            let top = rect.top - containerRect.top;
+            
+            // Ajustar se passar da tela
+            if (left + 250 > containerRect.width) {
+                left = rect.left - containerRect.left - 270;
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideProject() {
+            tooltip.classList.remove('visible');
+        }
+
+        // Criar partículas
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Auto-rotação lenta
+        let autoRotate = true;
+        
+        container.addEventListener('mousedown', () => { autoRotate = false; });
+        container.addEventListener('touchstart', () => { autoRotate = false; });
+        
+        setInterval(() => {
+            if (autoRotate) {
+                rotateY += 0.2;
+                brain.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                rotationInfo.textContent = `ROTAÇÃO: ${Math.round(rotateX)}° | ${Math.round(rotateY)}°`;
+            }
+        }, 50);
+
+        // Inicializar
+        createParticles();
+    </script>
+</body>
+</html>
