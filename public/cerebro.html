@@ -106,7 +106,7 @@ canvas { display: block; }
     <div class="modal-buttons">
       <a id="modal-link" href="#" target="_blank">🔗 Abrir no Navegador</a>
       <button id="modal-vscode">💻 Abrir no VS Code</button>
-      <button id="modal-cmd">⌨️ Copiar Caminho</button>
+      <button id="modal-cmd">⌨️ Abrir no CMD</button>
       <button id="modal-close-btn">✕ Fechar</button>
     </div>
     <p id="modal-cmd-msg" style="display:none;color:#00e5ff;font-size:0.8rem;margin-top:12px;word-break:break-all;"></p>
@@ -154,13 +154,14 @@ function openModal(p) {
     });
   };
 
-  // CMD button
+  // CMD button - copia comando para abrir CMD no diretorio
   document.getElementById('modal-cmd').onclick = () => {
-    const cmd = `cd "${p.dir}" && code "${p.file}"`;
-    navigator.clipboard.writeText(cmd).then(() => {
+    const cmd = `cd /d "${p.dir}"`;
+    const fullCmd = `cd /d "${p.dir}" && code "${p.file}"`;
+    navigator.clipboard.writeText(fullCmd).then(() => {
       const msg = document.getElementById('modal-cmd-msg');
       msg.style.display = 'block';
-      msg.innerHTML = '📋 Caminho copiado! Para abrir no VS Code, cole no terminal:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + cmd + '</code><br><br>Ou abra o CMD e cole:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">cd "' + p.dir + '"</code>';
+      msg.innerHTML = '📋 Comando copiado! Abra o <b>CMD</b> e cole:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + fullCmd + '</code><br><br>Ou apenas navegue até a pasta:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + cmd + '</code>';
     });
   };
 
