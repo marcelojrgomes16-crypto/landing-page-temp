@@ -5,447 +5,465 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cérebro Digital</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a1a;color:#fff;font-family:'Segoe UI',Tahoma,sans-serif;overflow:hidden;width:100vw;height:100vh}
-#canvas-container{position:fixed;top:0;left:0;width:100%;height:100%}
-.title{position:fixed;top:24px;left:50%;transform:translateX(-50%);font-size:2.4rem;font-weight:800;letter-spacing:4px;z-index:10;text-align:center;background:linear-gradient(90deg,#00e5ff,#00ff88,#00e5ff);background-size:200% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s ease-in-out infinite;text-shadow:0 0 40px rgba(0,229,255,.5)}
-.title::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:200px;height:2px;background:linear-gradient(90deg,transparent,#00e5ff,transparent);animation:shimmer 3s ease-in-out infinite;background-size:200% 100%}
-@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.status-bar{position:fixed;bottom:0;left:0;width:100%;height:44px;background:rgba(10,10,30,.85);backdrop-filter:blur(10px);border-top:1px solid rgba(0,229,255,.2);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:10;font-size:.8rem;color:rgba(0,229,255,.8)}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#00e5ff;box-shadow:0 0 8px #00e5ff;display:inline-block;margin-right:8px;animation:pulse-dot 2s infinite}
-@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
-.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:100;justify-content:center;align-items:center}
-.modal-overlay.active{display:flex}
-.modal{background:linear-gradient(145deg,rgba(15,15,40,.98),rgba(10,10,25,.98));border:1px solid rgba(0,229,255,.3);border-radius:16px;padding:40px;max-width:480px;width:90%;text-align:center;box-shadow:0 0 60px rgba(0,229,255,.15),inset 0 0 30px rgba(0,229,255,.05);animation:modalIn .3s ease}
-@keyframes modalIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-.modal-icon{font-size:3rem;margin-bottom:16px}
-.modal h2{font-size:1.5rem;margin-bottom:8px;color:#fff}
-.modal p{color:rgba(255,255,255,.6);margin-bottom:24px;line-height:1.6}
-.modal a{display:inline-block;padding:12px 36px;background:linear-gradient(135deg,#00e5ff,#0088ff);color:#fff;text-decoration:none;border-radius:30px;font-weight:700;font-size:1rem;transition:all .3s;box-shadow:0 0 20px rgba(0,229,255,.3)}
-.modal a:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,229,255,.5)}
-.modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.8rem;cursor:pointer;line-height:1}
-.modal-close:hover{color:#fff}
-.instructions{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);color:rgba(0,229,255,.4);font-size:.75rem;z-index:10;text-align:center;pointer-events:none}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { overflow: hidden; background: #0a0a1a; font-family: 'Segoe UI', system-ui, sans-serif; }
+canvas { display: block; }
+
+#title {
+  position: fixed; top: 20px; left: 0; right: 0; text-align: center;
+  font-size: 2rem; font-weight: 700; z-index: 10; pointer-events: none;
+  background: linear-gradient(90deg, #00e5ff, #7c4dff, #ff4081, #00e5ff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(0,229,255,0.3);
+  letter-spacing: 2px;
+}
+@keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+#status-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+  display: flex; justify-content: center; gap: 30px; padding: 12px 20px;
+  background: rgba(10,10,26,0.85); backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0,229,255,0.15); font-size: 0.8rem; color: #8899aa;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: #00e676; display: inline-block; margin-right: 6px; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+#instructions {
+  position: fixed; bottom: 50px; left: 0; right: 0; text-align: center;
+  font-size: 0.75rem; color: rgba(255,255,255,0.25); z-index: 10; pointer-events: none;
+}
+
+#modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  justify-content: center; align-items: center;
+}
+#modal-overlay.active { display: flex; }
+#modal {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  border: 1px solid rgba(0,229,255,0.2); border-radius: 16px;
+  padding: 32px; max-width: 420px; width: 90%; text-align: center;
+  box-shadow: 0 0 60px rgba(0,229,255,0.1); animation: modal-in 0.3s ease;
+}
+@keyframes modal-in { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+#modal h2 { color: #fff; font-size: 1.4rem; margin-bottom: 8px; }
+#modal .modal-emoji { font-size: 3rem; margin-bottom: 12px; }
+#modal p { color: #8899aa; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
+#modal a {
+  display: inline-block; padding: 10px 28px; background: linear-gradient(135deg, #00e5ff, #7c4dff);
+  color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+#modal a:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,229,255,0.4); }
+#modal-close {
+  position: absolute; top: 12px; right: 16px; background: none; border: none;
+  color: #556; font-size: 1.5rem; cursor: pointer;
+}
 </style>
 </head>
 <body>
-<div id="canvas-container"></div>
-<div class="title">CÉREBRO DIGITAL</div>
-<div class="instructions">Arraste para girar • Clique nos nós para acessar</div>
-<div class="status-bar">
-  <div><span class="status-dot"></span>Sistema Online</div>
-  <div id="clock"></div>
-  <div>6 Projetos Ativos</div>
+
+<div id="title">Cérebro Digital</div>
+
+<div id="instructions">Arraste para girar &bull; Clique nos nós para acessar</div>
+
+<div id="status-bar">
+  <span><span class="status-dot"></span>Sistema Online</span>
+  <span>6 Projetos Ativos</span>
+  <span id="clock"></span>
 </div>
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" style="position:relative">
-    <button class="modal-close" onclick="closeModal()">&times;</button>
-    <div class="modal-icon" id="modalIcon"></div>
-    <h2 id="modalTitle"></h2>
-    <p id="modalDesc"></p>
-    <a id="modalLink" href="#" target="_blank">Acessar</a>
+
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close">&times;</button>
+    <div class="modal-emoji" id="modal-emoji"></div>
+    <h2 id="modal-title"></h2>
+    <p id="modal-desc"></p>
+    <a id="modal-link" href="#" target="_blank">Acessar</a>
   </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const projects=[
-  {name:"Adega To Chegando",icon:"🍷",desc:"Plataforma de estoque e distribuição de bebidas",url:"https://estoque-distribuidora-th3q.onrender.com/"},
-  {name:"Para Myrella",icon:"💕",desc:"Landing page dedicada para Myrella",url:"https://landing-page-temp.onrender.com/"},
-  {name:"Biomedicina",icon:"🧬",desc:"Projeto de Biomedicina e ciências da saúde",url:"https://landing-page-temp.onrender.com/"},
-  {name:"Controle de Estoque",icon:"📦",desc:"Sistema completo de controle de estoque",url:"https://estoque-distribuidora-th3q.onrender.com/consumidor.html"},
-  {name:"API REST",icon:"⚡",desc:"API RESTful com endpoints documentados",url:"https://estoque-distribuidora-th3q.onrender.com/api/health"},
-  {name:"Deploy",icon:"🚀",desc:"Deploy contínuo via Render.com",url:"https://render.com"}
+const PROJECTS = [
+  { emoji:'🍷', name:'Adega To Chegando', desc:'Sistema de controle de estoque para distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/' },
+  { emoji:'💕', name:'Para Myrella', desc:'Landing page personalizada com design moderno e interativo.', url:'https://landing-page-temp.onrender.com/' },
+  { emoji:'🧬', name:'Biomedicina', desc:'Plataforma de informações e serviços de biomedicina.', url:'https://landing-page-temp.onrender.com/' },
+  { emoji:'📦', name:'Controle de Estoque', desc:'Módulo de gestão de estoque para consumidor final.', url:'https://estoque-distribuidora-th3q.onrender.com/consumidor.html' },
+  { emoji:'⚡', name:'API REST', desc:'Endpoint de health check e serviços RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health' },
+  { emoji:'🚀', name:'Deploy', desc:'Plataforma de deploy e hospedagem de aplicações.', url:'https://render.com' }
 ];
-
-const container=document.getElementById("canvas-container");
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,.1,2000);
-camera.position.set(0,0,30);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.setClearColor(0x0a0a1a);
-container.appendChild(renderer.domElement);
-
-const ambientLight=new THREE.AmbientLight(0x222244,.5);
-scene.add(ambientLight);
-const pointLight1=new THREE.PointLight(0x00e5ff,2,100);
-pointLight1.position.set(10,10,10);
-scene.add(pointLight1);
-const pointLight2=new THREE.PointLight(0xff4444,1,100);
-pointLight2.position.set(-10,-10,5);
-scene.add(pointLight2);
-const pointLight3=new THREE.PointLight(0x00ff88,.8,80);
-pointLight3.position.set(0,10,-10);
-scene.add(pointLight3);
-
-// Nucleus
-const nucleusGroup=new THREE.Group();
-scene.add(nucleusGroup);
-
-function createNucleon(color,isNeutron){
-  const geo=new THREE.SphereGeometry(isNeutron?.55:.5,16,16);
-  const mat=new THREE.MeshStandardMaterial({
-    color:color,
-    emissive:color,
-    emissiveIntensity:isNeutron?.2:.35,
-    metalness:.8,
-    roughness:.2,
-    transparent:true,
-    opacity:.9
-  });
-  const mesh=new THREE.Mesh(geo,mat);
-  return mesh;
-}
-
-const protons=[];
-const neutrons=[];
-for(let i=0;i<8;i++){
-  const p=createNucleon(0xff3333,false);
-  const theta=Math.random()*Math.PI*2;
-  const phi=Math.acos(2*Math.random()-1);
-  const r=Math.random()*1.4;
-  p.position.set(r*Math.sin(phi)*Math.cos(theta),r*Math.sin(phi)*Math.sin(theta),r*Math.cos(phi));
-  nucleusGroup.add(p);
-  protons.push(p);
-}
-for(let i=0;i<8;i++){
-  const n=createNucleon(0x888899,true);
-  const theta=Math.random()*Math.PI*2;
-  const phi=Math.acos(2*Math.random()-1);
-  const r=Math.random()*1.4;
-  n.position.set(r*Math.sin(phi)*Math.cos(theta),r*Math.sin(phi)*Math.sin(theta),r*Math.cos(phi));
-  nucleusGroup.add(n);
-  neutrons.push(n);
-}
-
-// Nucleus glow
-const glowGeo=new THREE.SphereGeometry(2.5,32,32);
-const glowMat=new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.06});
-const glowMesh=new THREE.Mesh(glowGeo,glowMat);
-nucleusGroup.add(glowMesh);
-
-const glowGeo2=new THREE.SphereGeometry(3.5,32,32);
-const glowMat2=new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.03});
-nucleusGroup.add(new THREE.Mesh(glowGeo2,glowMat2));
-
-// Orbitals
-const orbitals=[
-  {tilt:0,speed:.3,color:0x00e5ff},
-  {tilt:Math.PI/3,speed:.22,color:0x00ff88},
-  {tilt:-Math.PI/3,speed:.35,color:0x4488ff},
-  {tilt:Math.PI/2,speed:.18,color:0x00aaff}
-];
-
-const electronTrails=[];
-const orbitalGroups=[];
-const electronMeshes=[];
-
-orbitals.forEach((orb,oi)=>{
-  const orbGroup=new THREE.Group();
-  orbGroup.rotation.x=orb.tilt;
-  scene.add(orbGroup);
-  orbitalGroups.push(orbGroup);
-
-  // Orbit path ring
-  const ringGeo=new THREE.TorusGeometry(8+oi*3,.03,8,128);
-  const ringMat=new THREE.MeshBasicMaterial({color:orb.color,transparent:true,opacity:.15});
-  const ring=new THREE.Mesh(ringGeo,ringMat);
-  ring.rotation.x=Math.PI/2;
-  orbGroup.add(ring);
-
-  // Faint orbit ring glow
-  const ringGlow=new THREE.Mesh(
-    new THREE.TorusGeometry(8+oi*3,.15,8,128),
-    new THREE.MeshBasicMaterial({color:orb.color,transparent:true,opacity:.04})
-  );
-  ringGlow.rotation.x=Math.PI/2;
-  orbGroup.add(ringGlow);
-
-  // Electron
-  const electronGeo=new THREE.SphereGeometry(.3,16,16);
-  const electronMat=new THREE.MeshStandardMaterial({
-    color:0x00e5ff,
-    emissive:0x00e5ff,
-    emissiveIntensity:1,
-    metalness:1,
-    roughness:0
-  });
-  const electron=new THREE.Mesh(electronGeo,electronMat);
-  orbGroup.add(electron);
-  electronMeshes.push(electron);
-
-  // Electron glow
-  const eGlow=new THREE.Mesh(
-    new THREE.SphereGeometry(.7,16,16),
-    new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.3})
-  );
-  electron.add(eGlow);
-
-  // Trail
-  const trailLen=60;
-  const trailPositions=new Float32Array(trailLen*3);
-  const trailGeo=new THREE.BufferGeometry();
-  trailGeo.setAttribute("position",new THREE.BufferAttribute(trailPositions,3));
-  const trailMat=new THREE.LineBasicMaterial({color:orb.color,transparent:true,opacity:.4});
-  const trail=new THREE.Line(trailGeo,trailMat);
-  scene.add(trail);
-  electronTrails.push({line:trail,positions:trailPositions,history:[]});
-});
-
-// Project nodes in 3D
-const nodeGroup=new THREE.Group();
-scene.add(nodeGroup);
-const nodeMeshes=[];
-
-projects.forEach((proj,i)=>{
-  const group=new THREE.Group();
-  const phi=Math.acos(-1+(2*(i+.5))/projects.length);
-  const theta=Math.sqrt(projects.length*Math.PI)*phi;
-  const radius=16;
-  group.position.set(
-    radius*Math.cos(theta)*Math.sin(phi),
-    radius*Math.sin(theta)*Math.sin(phi)*.7,
-    radius*Math.cos(phi)
-  );
-  group.userData={project:proj,index:i};
-
-  // Node sphere
-  const geo=new THREE.SphereGeometry(.6,16,16);
-  const mat=new THREE.MeshStandardMaterial({
-    color:0x00e5ff,
-    emissive:0x00e5ff,
-    emissiveIntensity:.8,
-    metalness:.9,
-    roughness:.1,
-    transparent:true,
-    opacity:.9
-  });
-  const mesh=new THREE.Mesh(geo,mat);
-  group.add(mesh);
-
-  // Node glow
-  const nGlow=new THREE.Mesh(
-    new THREE.SphereGeometry(1.2,16,16),
-    new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.2})
-  );
-  group.add(nGlow);
-
-  // Emoji label
-  const labelCanvas=document.createElement("canvas");
-  labelCanvas.width=256;
-  labelCanvas.height=128;
-  const ctx=labelCanvas.getContext("2d");
-  ctx.clearRect(0,0,256,128);
-  ctx.font="bold 60px Segoe UI Emoji, Arial";
-  ctx.textAlign="center";
-  ctx.fillStyle="#00e5ff";
-  ctx.shadowColor="#00e5ff";
-  ctx.shadowBlur=20;
-  ctx.fillText(proj.icon,128,70);
-  ctx.font="bold 28px Segoe UI, Arial";
-  ctx.fillText(proj.name,128,115);
-  const tex=new THREE.CanvasTexture(labelCanvas);
-  const spriteMat=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:1});
-  const sprite=new THREE.Sprite(spriteMat);
-  sprite.scale.set(5,2.5,1);
-  sprite.position.y=2;
-  group.add(sprite);
-
-  // Connecting line to center
-  const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),group.position.clone().negate()]);
-  const lineMat=new THREE.LineBasicMaterial({color:0x00e5ff,transparent:true,opacity:.1});
-  const line=new THREE.Line(lineGeo,lineMat);
-  nodeGroup.add(line);
-
-  nodeGroup.add(group);
-  nodeMeshes.push(group);
-});
-
-// Stars
-const starsGeo=new THREE.BufferGeometry();
-const starsCount=3000;
-const starsPos=new Float32Array(starsCount*3);
-for(let i=0;i<starsCount*3;i++){
-  starsPos[i]=(Math.random()-.5)*200;
-}
-starsGeo.setAttribute("position",new THREE.BufferAttribute(starsPos,3));
-const starsMat=new THREE.PointsMaterial({color:0xffffff,size:.15,transparent:true,opacity:.6});
-scene.add(new THREE.Points(starsGeo,starsMat));
-
-// Floating particles around atom
-const partGeo=new THREE.BufferGeometry();
-const partCount=500;
-const partPos=new Float32Array(partCount*3);
-for(let i=0;i<partCount;i++){
-  const r=10+Math.random()*12;
-  const t=Math.random()*Math.PI*2;
-  const p=Math.acos(2*Math.random()-1);
-  partPos[i*3]=r*Math.sin(p)*Math.cos(t);
-  partPos[i*3+1]=r*Math.sin(p)*Math.sin(t);
-  partPos[i*3+2]=r*Math.cos(p);
-}
-partGeo.setAttribute("position",new THREE.BufferAttribute(partPos,3));
-const partMat=new THREE.PointsMaterial({color:0x00e5ff,size:.08,transparent:true,opacity:.3});
-const particles=new THREE.Points(partGeo,partMat);
-scene.add(particles);
-
-// Mouse / Touch controls
-let isDragging=false;
-let prevMouse={x:0,y:0};
-let rotVel={x:0,y:0};
-let rotX=0,rotY=0;
-let targetRotX=0,targetRotY=0;
-
-function onPointerDown(e){
-  isDragging=true;
-  const point=e.touches?e.touches[0]:e;
-  prevMouse={x:point.clientX,y:point.clientY};
-}
-function onPointerMove(e){
-  if(!isDragging)return;
-  const point=e.touches?e.touches[0]:e;
-  const dx=point.clientX-prevMouse.x;
-  const dy=point.clientY-prevMouse.y;
-  rotVel.x=dx*.005;
-  rotVel.y=dy*.005;
-  targetRotY+=dx*.005;
-  targetRotX+=dy*.005;
-  targetRotX=Math.max(-Math.PI/3,Math.min(Math.PI/3,targetRotX));
-  prevMouse={x:point.clientX,y:point.clientY};
-}
-function onPointerUp(){isDragging=false}
-function onClick(e){
-  if(e.target.closest(".modal"))return;
-  const raycaster=new THREE.Raycaster();
-  const mouse=new THREE.Vector2();
-  mouse.x=(e.clientX/window.innerWidth)*2-1;
-  mouse.y=-(e.clientY/window.innerHeight)*2+1;
-  raycaster.setFromCamera(mouse,camera);
-  const intersects=raycaster.intersectObjects(nodeMeshes.map(g=>g.children[0]),false);
-  if(intersects.length>0){
-    const obj=intersects[0].object;
-    const node=obj.parent;
-    if(node.userData.project){
-      showModal(node.userData.project);
-    }
-  }else{
-    const allSpheres=nodeMeshes.map(g=>g.children[1]);
-    const hit=raycaster.intersectObjects(allSpheres,false);
-    if(hit.length>0){
-      const node=hit[0].object.parent;
-      if(node.userData.project){
-        showModal(node.userData.project);
-      }
-    }
-  }
-}
-
-renderer.domElement.addEventListener("mousedown",onPointerDown);
-renderer.domElement.addEventListener("mousemove",onPointerMove);
-renderer.domElement.addEventListener("mouseup",onPointerUp);
-renderer.domElement.addEventListener("mouseleave",onPointerUp);
-renderer.domElement.addEventListener("touchstart",onPointerDown,{passive:true});
-renderer.domElement.addEventListener("touchmove",onPointerMove,{passive:true});
-renderer.domElement.addEventListener("touchend",onPointerUp);
-renderer.domElement.addEventListener("click",onClick);
-
-function showModal(p){
-  document.getElementById("modalIcon").textContent=p.icon;
-  document.getElementById("modalTitle").textContent=p.name;
-  document.getElementById("modalDesc").textContent=p.desc;
-  document.getElementById("modalLink").href=p.url;
-  document.getElementById("modalOverlay").classList.add("active");
-}
-function closeModal(){
-  document.getElementById("modalOverlay").classList.remove("active");
-}
-document.getElementById("modalOverlay").addEventListener("click",function(e){
-  if(e.target===this)closeModal();
-});
 
 // Clock
-function updateClock(){
-  const now=new Date();
-  document.getElementById("clock").textContent=now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR');
 }
-setInterval(updateClock,1000);
-updateClock();
+updateClock(); setInterval(updateClock, 1000);
 
-// Animate
-const clock=new THREE.Clock();
-function animate(){
-  requestAnimationFrame(animate);
-  const t=clock.getElapsedTime();
+// Modal
+const overlay = document.getElementById('modal-overlay');
+document.getElementById('modal-close').onclick = () => overlay.classList.remove('active');
+overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('active'); };
 
-  if(!isDragging){
-    rotVel.x*=.95;
-    rotVel.y*=.95;
-    targetRotY+=rotVel.x;
-    targetRotX+=rotVel.y;
-    targetRotX=Math.max(-Math.PI/3,Math.min(Math.PI/3,targetRotX));
+function openModal(p) {
+  document.getElementById('modal-emoji').textContent = p.emoji;
+  document.getElementById('modal-title').textContent = p.name;
+  document.getElementById('modal-desc').textContent = p.desc;
+  document.getElementById('modal-link').href = p.url;
+  overlay.classList.add('active');
+}
+
+// Scene
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a1a);
+scene.fog = new THREE.FogExp2(0x0a0a1a, 0.012);
+
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(0, 0, 22);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+// Lights
+scene.add(new THREE.AmbientLight(0x334455, 0.6));
+const pLight = new THREE.PointLight(0xff6644, 1.5, 30);
+pLight.position.set(0, 0, 0);
+scene.add(pLight);
+const pLight2 = new THREE.PointLight(0x4488ff, 0.8, 40);
+pLight2.position.set(5, 5, 5);
+scene.add(pLight2);
+
+// Stars
+const starGeo = new THREE.BufferGeometry();
+const starPos = new Float32Array(2000 * 3);
+for (let i = 0; i < 2000; i++) {
+  const r = 40 + Math.random() * 80;
+  const t = Math.random() * Math.PI * 2;
+  const p = Math.acos(2 * Math.random() - 1);
+  starPos[i*3] = r * Math.sin(p) * Math.cos(t);
+  starPos[i*3+1] = r * Math.sin(p) * Math.sin(t);
+  starPos[i*3+2] = r * Math.cos(p);
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, sizeAttenuation: true })));
+
+// Atom group
+const atomGroup = new THREE.Group();
+scene.add(atomGroup);
+
+// --- NUCLEUS ---
+const nucleusGroup = new THREE.Group();
+atomGroup.add(nucleusGroup);
+
+const protonMat = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0xff2222, emissiveIntensity: 0.3, roughness: 0.4, metalness: 0.2 });
+const neutronMat = new THREE.MeshStandardMaterial({ color: 0x888899, emissive: 0x555566, emissiveIntensity: 0.2, roughness: 0.5, metalness: 0.1 });
+const sphereGeo = new THREE.SphereGeometry(0.42, 16, 16);
+
+// Place nucleons in clustered formation
+const nucleonPositions = [];
+const layers = [
+  { count: 4, r: 0, y: 0 },
+  { count: 8, r: 0.7, y: 0 },
+  { count: 6, r: 0.5, y: 0.55 },
+  { count: 6, r: 0.5, y: -0.55 },
+  { count: 4, r: 0.3, y: 1.0 },
+  { count: 4, r: 0.3, y: -1.0 }
+];
+let idx = 0;
+layers.forEach(layer => {
+  for (let i = 0; i < layer.count; i++) {
+    const angle = (i / layer.count) * Math.PI * 2 + Math.random() * 0.3;
+    const rr = layer.r * (0.7 + Math.random() * 0.6);
+    nucleonPositions.push(new THREE.Vector3(
+      Math.cos(angle) * rr,
+      layer.y + (Math.random() - 0.5) * 0.3,
+      Math.sin(angle) * rr
+    ));
+    idx++;
   }
+});
 
-  rotX+=(targetRotX-rotX)*.05;
-  rotY+=(targetRotY-rotY)*.05;
-  rotY+=.001;
+nucleonPositions.forEach((pos, i) => {
+  const mat = i < 12 ? protonMat : neutronMat;
+  const mesh = new THREE.Mesh(sphereGeo, mat);
+  mesh.position.copy(pos);
+  nucleusGroup.add(mesh);
+});
 
-  nucleusGroup.rotation.x=rotX;
-  nucleusGroup.rotation.y=rotY;
-  nucleusGroup.rotation.z=t*.15;
+// Nucleus glow
+const glowGeo = new THREE.SphereGeometry(1.6, 32, 32);
+const glowMat = new THREE.MeshBasicMaterial({
+  color: 0xff4444, transparent: true, opacity: 0.08, side: THREE.BackSide
+});
+nucleusGroup.add(new THREE.Mesh(glowGeo, glowMat));
+const glowGeo2 = new THREE.SphereGeometry(2.2, 32, 32);
+const glowMat2 = new THREE.MeshBasicMaterial({
+  color: 0xff2244, transparent: true, opacity: 0.04, side: THREE.BackSide
+});
+nucleusGroup.add(new THREE.Mesh(glowGeo2, glowMat2));
 
-  nodeGroup.rotation.x=rotX;
-  nodeGroup.rotation.y=rotY;
+// --- ORBITAL PATHS & ELECTRONS ---
+const orbitalDefs = [
+  { rx: 8, rz: 5, tiltX: 0, tiltZ: 0, speed: 1.0, color: 0x00e5ff, startAngle: 0 },
+  { rx: 6, rz: 10, tiltX: 60, tiltZ: 0, speed: 0.7, color: 0x7c4dff, startAngle: 2.1 },
+  { rx: 9, rz: 4, tiltX: -60, tiltZ: 0, speed: 1.3, color: 0x00bcd4, startAngle: 4.2 },
+  { rx: 5, rz: 7, tiltX: 90, tiltZ: 0, speed: 0.9, color: 0x448aff, startAngle: 1.0 }
+];
 
-  // Orbit electrons
-  orbitals.forEach((orb,i)=>{
-    const radius=8+i*3;
-    const angle=t*orb.speed*(i%2===0?1:-1);
-    const e=electronMeshes[i];
-    e.position.set(Math.cos(angle)*radius,0,Math.sin(angle)*radius);
+const electrons = [];
+const trails = [];
 
-    // Trail update
-    const trail=electronTrails[i];
-    const worldPos=new THREE.Vector3();
-    e.getWorldPosition(worldPos);
-    trail.history.push(worldPos.x,worldPos.y,worldPos.z);
-    if(trail.history.length>60*3)trail.history.splice(0,3);
-    for(let j=0;j<Math.min(trail.history.length,60*3);j++){
-      trail.positions[j]=trail.history[j];
+orbitalDefs.forEach((def, i) => {
+  const orbitalGroup = new THREE.Group();
+  orbitalGroup.rotation.x = THREE.MathUtils.degToRad(def.tiltX);
+  orbitalGroup.rotation.z = THREE.MathUtils.degToRad(def.tiltZ);
+  atomGroup.add(orbitalGroup);
+
+  // Draw elliptical path
+  const curve = new THREE.EllipseCurve(0, 0, def.rx, def.rz, 0, 2 * Math.PI, false, 0);
+  const pts = curve.getPoints(128);
+  const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+  const lineMat = new THREE.LineBasicMaterial({ color: def.color, transparent: true, opacity: 0.2 });
+  const line = new THREE.LineLoop(lineGeo, lineMat);
+  orbitalGroup.add(line);
+
+  // Glow ring
+  const ringGeo = new THREE.RingGeometry(def.rx - 0.08, def.rx + 0.08, 64);
+  // We'll skip ring geometry for simplicity and use the line
+
+  // Electron sphere
+  const eMat = new THREE.MeshBasicMaterial({ color: def.color });
+  const eGeo = new THREE.SphereGeometry(0.2, 12, 12);
+  const electron = new THREE.Mesh(eGeo, eMat);
+  orbitalGroup.add(electron);
+
+  // Electron glow
+  const eGlowMat = new THREE.MeshBasicMaterial({ color: def.color, transparent: true, opacity: 0.3 });
+  const eGlow = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 12), eGlowMat);
+  orbitalGroup.add(eGlow);
+
+  // Trail
+  const trailLen = 20;
+  const trailPositions = new Float32Array(trailLen * 3);
+  const trailGeo = new THREE.BufferGeometry();
+  trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+  const trailMat = new THREE.LineBasicMaterial({ color: def.color, transparent: true, opacity: 0.4 });
+  const trail = new THREE.Line(trailGeo, trailMat);
+  orbitalGroup.add(trail);
+
+  // Small particles near electron
+  const partCount = 6;
+  const partGeo = new THREE.BufferGeometry();
+  const partPos = new Float32Array(partCount * 3);
+  partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+  const partMat = new THREE.PointsMaterial({ color: def.color, size: 0.08, transparent: true, opacity: 0.6 });
+  const particles = new THREE.Points(partGeo, partMat);
+  orbitalGroup.add(particles);
+
+  electrons.push({ orbital: orbitalGroup, curve, electron, eGlow, def, angle: def.startAngle, trail, trailGeo, trailPositions, trailLen, particles, partGeo, partPos, partCount });
+});
+
+// Nucleus ambient glow particles
+const nucleonPartCount = 30;
+const nucleonPartGeo = new THREE.BufferGeometry();
+const nucleonPartPos = new Float32Array(nucleonPartCount * 3);
+for (let i = 0; i < nucleonPartCount; i++) {
+  const a = Math.random() * Math.PI * 2;
+  const r = 1.0 + Math.random() * 0.8;
+  nucleonPartPos[i*3] = Math.cos(a) * r;
+  nucleonPartPos[i*3+1] = (Math.random()-0.5) * 1.6;
+  nucleonPartPos[i*3+2] = Math.sin(a) * r;
+}
+nucleonPartGeo.setAttribute('position', new THREE.BufferAttribute(nucleonPartPos, 3));
+const nucleonPartMat = new THREE.PointsMaterial({ color: 0xff6644, size: 0.12, transparent: true, opacity: 0.4 });
+nucleusGroup.add(new THREE.Points(nucleonPartGeo, nucleonPartMat));
+
+// --- PROJECT NODES ---
+const nodeGroup = new THREE.Group();
+atomGroup.add(nodeGroup);
+
+const nodeMeshes = [];
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+PROJECTS.forEach((p, i) => {
+  const angle = (i / PROJECTS.length) * Math.PI * 2;
+  const r = 14;
+  const y = (Math.random() - 0.5) * 3;
+  const x = Math.cos(angle) * r;
+  const z = Math.sin(angle) * r;
+
+  // Node sphere
+  const nGeo = new THREE.SphereGeometry(0.35, 16, 16);
+  const nMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+  const node = new THREE.Mesh(nGeo, nMat);
+  node.position.set(x, y, z);
+  node.userData = { project: p };
+  nodeGroup.add(node);
+
+  // Node glow
+  const ngGeo = new THREE.SphereGeometry(0.6, 16, 16);
+  const ngMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.15 });
+  const nGlow = new THREE.Mesh(ngGeo, ngMat);
+  node.add(nGlow);
+
+  // Line to center
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(x, y, z)
+  ]);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.08 });
+  nodeGroup.add(new THREE.Line(lineGeo, lineMat));
+
+  // Canvas sprite for emoji
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.font = '64px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(p.emoji, 64, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+  const sprite = new THREE.Sprite(spriteMat);
+  sprite.scale.set(1.2, 1.2, 1);
+  sprite.position.set(x, y + 0.8, z);
+  nodeGroup.add(sprite);
+
+  // Label
+  const lCanvas = document.createElement('canvas');
+  lCanvas.width = 256; lCanvas.height = 64;
+  const lCtx = lCanvas.getContext('2d');
+  lCtx.font = 'bold 22px Segoe UI, sans-serif';
+  lCtx.fillStyle = '#ffffff';
+  lCtx.textAlign = 'center';
+  lCtx.fillText(p.name, 128, 36);
+  const lTex = new THREE.CanvasTexture(lCanvas);
+  const lMat = new THREE.SpriteMaterial({ map: lTex, transparent: true });
+  const label = new THREE.Sprite(lMat);
+  label.scale.set(3, 0.75, 1);
+  label.position.set(x, y - 0.7, z);
+  nodeGroup.add(label);
+
+  nodeMeshes.push(node);
+});
+
+// --- MOUSE INTERACTION ---
+let isDragging = false;
+let prevMouse = { x: 0, y: 0 };
+let rotVel = { x: 0, y: 0 };
+const autoRotateSpeed = 0.003;
+
+renderer.domElement.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  prevMouse = { x: e.clientX, y: e.clientY };
+});
+renderer.domElement.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - prevMouse.x;
+  const dy = e.clientY - prevMouse.y;
+  rotVel.x = dy * 0.005;
+  rotVel.y = dx * 0.005;
+  prevMouse = { x: e.clientX, y: e.clientY };
+});
+renderer.domElement.addEventListener('mouseup', () => isDragging = false);
+renderer.domElement.addEventListener('mouseleave', () => isDragging = false);
+
+// Touch
+renderer.domElement.addEventListener('touchstart', (e) => {
+  isDragging = true;
+  prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+renderer.domElement.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  const dx = e.touches[0].clientX - prevMouse.x;
+  const dy = e.touches[0].clientY - prevMouse.y;
+  rotVel.x = dy * 0.005;
+  rotVel.y = dx * 0.005;
+  prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+renderer.domElement.addEventListener('touchend', () => isDragging = false);
+
+// Click on nodes
+renderer.domElement.addEventListener('click', (e) => {
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(nodeMeshes);
+  if (hits.length > 0) openModal(hits[0].object.userData.project);
+});
+
+// Resize
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// --- ANIMATE ---
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // Auto rotate
+  if (!isDragging) {
+    rotVel.y += autoRotateSpeed;
+    rotVel.x *= 0.95;
+  }
+  rotVel.y *= 0.98;
+  rotVel.x *= 0.98;
+
+  atomGroup.rotation.x += rotVel.x;
+  atomGroup.rotation.y += rotVel.y;
+
+  // Nucleus wobble
+  nucleusGroup.rotation.x = Math.sin(t * 1.5) * 0.05;
+  nucleusGroup.rotation.z = Math.cos(t * 1.2) * 0.04;
+  nucleusGroup.position.y = Math.sin(t * 0.8) * 0.05;
+
+  // Electrons
+  electrons.forEach((e) => {
+    e.angle += e.def.speed * 0.015;
+    const pos = e.curve.getPointAt(((e.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2));
+    e.electron.position.set(pos.x, 0, pos.y);
+    e.eGlow.position.copy(e.electron.position);
+
+    // Trail
+    e.trailPositions.copyWithin(3);
+    e.trailPositions[e.trailLen * 3 - 3] = pos.x;
+    e.trailPositions[e.trailLen * 3 - 2] = 0;
+    e.trailPositions[e.trailLen * 3 - 1] = pos.y;
+    e.trailGeo.attributes.position.needsUpdate = true;
+
+    // Particles around electron
+    for (let j = 0; j < e.partCount; j++) {
+      const pa = Math.random() * Math.PI * 2;
+      const pr = 0.2 + Math.random() * 0.3;
+      e.partPos[j*3] = pos.x + Math.cos(pa) * pr;
+      e.partPos[j*3+1] = (Math.random()-0.5) * 0.4;
+      e.partPos[j*3+2] = pos.y + Math.sin(pa) * pr;
     }
-    trail.line.geometry.attributes.position.needsUpdate=true;
-    trail.line.geometry.setDrawRange(0,Math.floor(trail.history.length/3));
+    e.partGeo.attributes.position.needsUpdate = true;
   });
 
-  // Animate nucleus particles gently
-  protons.forEach((p,i)=>{
-    p.position.y+=Math.sin(t*2+i)*.002;
-    p.position.x+=Math.cos(t*1.5+i)*.001;
-  });
-  neutrons.forEach((n,i)=>{
-    n.position.z+=Math.sin(t*1.8+i)*.002;
+  // Node pulse
+  nodeMeshes.forEach((n, i) => {
+    const s = 1 + Math.sin(t * 2 + i) * 0.1;
+    n.children[0].scale.set(s, s, s);
   });
 
-  // Node float
-  nodeMeshes.forEach((node,i)=>{
-    node.position.y+=Math.sin(t*.8+i*1.2)*.003;
-    node.children[0].material.emissiveIntensity=.4+Math.sin(t*2+i)*.2;
-    node.children[1].scale.setScalar(1+Math.sin(t*2+i)*.15);
-  });
-
-  // Particles rotation
-  particles.rotation.y=t*.02;
-  particles.rotation.x=t*.01;
-
-  renderer.render(scene,camera);
+  renderer.render(scene, camera);
 }
 animate();
-
-window.addEventListener("resize",()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
-});
 </script>
 </body>
 </html>
