@@ -5,682 +5,566 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cérebro Digital</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
---cyan:#00e5ff;--green:#00ff88;--bg:#050a12;--blue:#0a1628;--purple:#7b2fff;
---glow-cyan:0 0 20px #00e5ff,0 0 40px #00e5ff,0 0 80px rgba(0,229,255,.3);
---glow-green:0 0 20px #00ff88,0 0 40px #00ff88,0 0 80px rgba(0,255,136,.3);
-}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Orbitron',monospace;color:var(--cyan)}
-
-#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
-
-.grid-overlay{
-position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;
-background-image:
-linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),
-linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
-background-size:50px 50px;
-animation:gridScroll 20s linear infinite;
-}
-@keyframes gridScroll{0%{background-position:0 0}100%{background-position:50px 50px}}
-
-.title{
-position:fixed;top:30px;left:50%;transform:translateX(-50%);z-index:100;
-font-size:clamp(18px,4vw,36px);font-weight:900;letter-spacing:8px;text-transform:uppercase;
-background:linear-gradient(135deg,var(--cyan),var(--green),var(--cyan));
--webkit-background-clip:text;-webkit-text-fill-color:transparent;
-text-shadow:none;filter:drop-shadow(0 0 20px rgba(0,229,255,.5));
-animation:titlePulse 3s ease-in-out infinite;
-}
-.title::before{
-content:'[ ';color:var(--cyan);-webkit-text-fill-color:var(--cyan);
-}
-.title::after{
-content:' ]';color:var(--cyan);-webkit-text-fill-color:var(--cyan);
-}
-@keyframes titlePulse{0%,100%{filter:drop-shadow(0 0 20px rgba(0,229,255,.5))}50%{filter:drop-shadow(0 0 40px rgba(0,229,255,.8))}}
-
-.rotation-display{
-position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:100;
-font-family:'Rajdhani',sans-serif;font-size:13px;color:rgba(0,229,255,.5);
-letter-spacing:3px;
-}
-
-.scene-container{
-position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-z-index:10;perspective:1200px;cursor:grab;
-}
-.scene-container:active{cursor:grabbing}
-
-.brain-wrapper{
-width:clamp(280px,40vw,450px);height:clamp(280px,40vw,450px);
-position:relative;transform-style:preserve-3d;
-transition:transform .05s linear;
-}
-
-.brain-layer{
-position:absolute;top:0;left:0;width:100%;height:100%;
-border-radius:50%;transform-style:preserve-3d;
-}
-
-/* Core brain shape - layered ellipses */
-.brain-core{
-position:absolute;top:10%;left:10%;width:80%;height:80%;
-background:radial-gradient(ellipse at 40% 40%,rgba(0,229,255,.12),rgba(0,255,136,.05),transparent 70%);
-border:1px solid rgba(0,229,255,.15);border-radius:48% 52% 45% 55% / 50% 48% 52% 50%;
-box-shadow:0 0 30px rgba(0,229,255,.1),inset 0 0 60px rgba(0,229,255,.05);
-animation:brainPulse 4s ease-in-out infinite;
-}
-.brain-core::before{
-content:'';position:absolute;top:-5%;left:-5%;width:110%;height:110%;
-border:1px solid rgba(0,229,255,.08);border-radius:46% 54% 50% 50% / 52% 48% 52% 48%;
-animation:brainPulse 4s ease-in-out infinite reverse;
-}
-.brain-core::after{
-content:'';position:absolute;top:5%;left:5%;width:90%;height:90%;
-background:radial-gradient(ellipse at 60% 30%,rgba(123,47,255,.08),transparent 60%);
-border-radius:50% 50% 48% 52% / 46% 54% 46% 54%;
-}
-@keyframes brainPulse{
-0%,100%{transform:scale(1);box-shadow:0 0 30px rgba(0,229,255,.1),inset 0 0 60px rgba(0,229,255,.05)}
-50%{transform:scale(1.02);box-shadow:0 0 50px rgba(0,229,255,.2),inset 0 0 80px rgba(0,229,255,.08)}
-}
-
-.brain-svg{
-position:absolute;top:5%;left:5%;width:90%;height:90%;z-index:5;
-filter:drop-shadow(0 0 10px rgba(0,229,255,.3));
-}
-
-.circuit-path{
-fill:none;stroke:var(--cyan);stroke-width:1.5;stroke-linecap:round;
-stroke-dasharray:8 12;opacity:.6;
-animation:dashFlow 3s linear infinite;
-}
-.circuit-path.green{stroke:var(--green);animation-duration:4s;stroke-dasharray:6 10}
-.circuit-path.purple{stroke:var(--purple);animation-duration:5s;stroke-dasharray:10 8}
-.circuit-path.slow{animation-duration:6s}
-
-@keyframes dashFlow{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-40}}
-
-.circuit-node{
-fill:var(--cyan);filter:url(#glow);
-animation:nodePulse 2s ease-in-out infinite;
-}
-.circuit-node.green{fill:var(--green)}
-.circuit-node.purple{fill:var(--purple)}
-.circuit-node:nth-child(odd){animation-delay:-1s}
-.circuit-node:nth-child(3n){animation-delay:-.5s}
-@keyframes nodePulse{0%,100%{opacity:.4;r:2.5}50%{opacity:1;r:4}}
-
-/* Outer rings */
-.outer-ring{
-position:absolute;top:-5%;left:-5%;width:110%;height:110%;
-border:1px solid rgba(0,229,255,.06);border-radius:50%;
-animation:ringRotate 30s linear infinite;
-}
-.outer-ring::before{
-content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;
-border:1px dashed rgba(0,255,136,.04);border-radius:50%;
-animation:ringRotate 20s linear infinite reverse;
-}
-.outer-ring-2{
-position:absolute;top:-10%;left:-10%;width:120%;height:120%;
-border:1px solid rgba(123,47,255,.04);border-radius:50%;
-animation:ringRotate 40s linear infinite reverse;
-}
-@keyframes ringRotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-
-/* Brain hemisphere divider */
-.hemisphere-line{
-position:absolute;top:8%;left:50%;width:1px;height:84%;
-background:linear-gradient(transparent,rgba(0,229,255,.15),rgba(0,229,255,.3),rgba(0,229,255,.15),transparent);
-z-index:6;
-}
-.hemisphere-line::before{
-content:'';position:absolute;top:20%;left:-1px;width:3px;height:60%;
-background:linear-gradient(transparent,rgba(0,229,255,.1),transparent);
-}
-
-/* Project nodes */
-.project-node{
-position:absolute;z-index:20;cursor:pointer;
-transform-style:preserve-3d;
-}
-.node-dot{
-width:14px;height:14px;border-radius:50%;
-background:var(--cyan);position:relative;
-box-shadow:0 0 10px var(--cyan),0 0 20px rgba(0,229,255,.3);
-animation:dotFloat 3s ease-in-out infinite;
-transition:all .3s ease;
-}
-.node-dot::before{
-content:'';position:absolute;top:-6px;left:-6px;width:26px;height:26px;
-border:1px solid rgba(0,229,255,.3);border-radius:50%;
-animation:ripple 2s ease-out infinite;
-}
-.node-dot::after{
-content:'';position:absolute;top:-12px;left:-12px;width:38px;height:38px;
-border:1px solid rgba(0,229,255,.15);border-radius:50%;
-animation:ripple 2s ease-out infinite .5s;
-}
-@keyframes ripple{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.5);opacity:0}}
-@keyframes dotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-
-.project-node:nth-child(1) .node-dot{background:var(--cyan);box-shadow:0 0 10px var(--cyan),0 0 20px rgba(0,229,255,.3);animation-delay:0s}
-.project-node:nth-child(2) .node-dot{background:#ff6b9d;box-shadow:0 0 10px #ff6b9d,0 0 20px rgba(255,107,157,.3);animation-delay:-.5s}
-.project-node:nth-child(3) .node-dot{background:var(--green);box-shadow:0 0 10px var(--green),0 0 20px rgba(0,255,136,.3);animation-delay:-1s}
-.project-node:nth-child(4) .node-dot{background:#ffaa00;box-shadow:0 0 10px #ffaa00,0 0 20px rgba(255,170,0,.3);animation-delay:-1.5s}
-.project-node:nth-child(5) .node-dot{background:var(--purple);box-shadow:0 0 10px var(--purple),0 0 20px rgba(123,47,255,.3);animation-delay:-2s}
-.project-node:nth-child(6) .node-dot{background:#00ffcc;box-shadow:0 0 10px #00ffcc,0 0 20px rgba(0,255,204,.3);animation-delay:-2.5s}
-
-.node-line{
-position:absolute;width:1px;height:50px;
-background:linear-gradient(var(--cyan),transparent);
-top:14px;left:6.5px;opacity:.3;
-transform-origin:top center;
-}
-
-.tooltip{
-position:absolute;bottom:calc(100% + 20px);left:50%;transform:translateX(-50%) translateY(10px);
-width:260px;padding:16px 18px;
-background:rgba(5,10,18,.95);
-border:1px solid rgba(0,229,255,.25);
-border-radius:4px;
-backdrop-filter:blur(20px);
-opacity:0;visibility:hidden;transition:all .3s ease;
-pointer-events:none;z-index:1000;
-box-shadow:0 0 30px rgba(0,229,255,.1),inset 0 0 30px rgba(0,229,255,.03);
-}
-.tooltip::before{
-content:'';position:absolute;top:0;left:0;right:0;height:1px;
-background:linear-gradient(90deg,transparent,var(--cyan),transparent);
-}
-.tooltip::after{
-content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%) rotate(45deg);
-width:10px;height:10px;background:rgba(5,10,18,.95);
-border-right:1px solid rgba(0,229,255,.25);border-bottom:1px solid rgba(0,229,255,.25);
-}
-.project-node:hover .tooltip{
-opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);
-}
-.project-node:hover .node-dot{
-transform:scale(1.5);
-}
-
-.tooltip-title{
-font-family:'Orbitron',monospace;font-size:12px;font-weight:700;
-margin-bottom:8px;letter-spacing:2px;
-background:linear-gradient(135deg,var(--cyan),var(--green));
--webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.tooltip-desc{
-font-family:'Rajdhani',sans-serif;font-size:12px;
-color:rgba(0,229,255,.7);margin-bottom:6px;line-height:1.4;
-}
-.tooltip-tech{
-font-family:'Rajdhani',sans-serif;font-size:10px;
-color:var(--green);margin-bottom:8px;letter-spacing:1px;
-text-transform:uppercase;
-}
-.tooltip-url{
-font-family:'Rajdhani',sans-serif;font-size:10px;
-color:rgba(0,229,255,.4);word-break:break-all;
-border-top:1px solid rgba(0,229,255,.1);padding-top:6px;
-}
-.tooltip-url a{color:var(--cyan);text-decoration:none;transition:color .2s}
-.tooltip-url a:hover{color:var(--green)}
-
-/* Bottom bar */
-.bottom-bar{
-position:fixed;bottom:0;left:0;width:100%;z-index:100;
-background:linear-gradient(transparent,rgba(5,10,18,.9));
-padding:20px 0 15px;
-}
-.status-bar{
-display:flex;justify-content:center;gap:clamp(15px,4vw,50px);
-font-family:'Rajdhani',sans-serif;font-size:clamp(9px,1.5vw,12px);
-letter-spacing:3px;text-transform:uppercase;
-}
-.status-item{
-display:flex;align-items:center;gap:8px;
-color:rgba(0,229,255,.5);
-}
-.status-dot{
-width:6px;height:6px;border-radius:50%;
-background:var(--green);
-box-shadow:0 0 8px var(--green);
-animation:statusBlink 2s ease-in-out infinite;
-}
-@keyframes statusBlink{0%,100%{opacity:1}50%{opacity:.3}}
-
-.instructions{
-text-align:center;font-family:'Rajdhani',sans-serif;font-size:clamp(9px,1.5vw,11px);
-color:rgba(0,229,255,.3);letter-spacing:4px;margin-top:10px;
-animation:instrFade 3s ease-in-out infinite;
-}
-@keyframes instrFade{0%,100%{opacity:.3}50%{opacity:.6}}
-
-/* Hexagon decorations */
-.hex-deco{
-position:fixed;z-index:2;opacity:.03;
-border:1px solid var(--cyan);
-clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-animation:hexFloat 8s ease-in-out infinite;
-}
-@keyframes hexFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-10px) rotate(5deg)}}
-
-/* Corner brackets */
-.corner{position:fixed;z-index:50;width:40px;height:40px}
-.corner::before,.corner::after{content:'';position:absolute;background:var(--cyan)}
-.corner.tl{top:15px;left:15px}.corner.tl::before{top:0;left:0;width:20px;height:1px}.corner.tl::after{top:0;left:0;width:1px;height:20px}
-.corner.tr{top:15px;right:15px}.corner.tr::before{top:0;right:0;width:20px;height:1px}.corner.tr::after{top:0;right:0;width:1px;height:20px}
-.corner.bl{bottom:60px;left:15px}.corner.bl::before{bottom:0;left:0;width:20px;height:1px}.corner.bl::after{bottom:0;left:0;width:1px;height:20px}
-.corner.br{bottom:60px;right:15px}.corner.br::before{bottom:0;right:0;width:20px;height:1px}.corner.br::after{bottom:0;right:0;width:1px;height:20px}
-
-/* Scanline */
-.scanline{
-position:fixed;top:0;left:0;width:100%;height:100%;z-index:99;
-background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.008) 2px,rgba(0,229,255,.008) 4px);
-pointer-events:none;
-}
-
-/* Loading overlay */
-.loading-overlay{
-position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;
-background:var(--bg);display:flex;flex-direction:column;
-align-items:center;justify-content:center;gap:20px;
-transition:opacity .8s ease,visibility .8s ease;
-}
-.loading-overlay.hidden{opacity:0;visibility:hidden}
-.loading-text{
-font-family:'Orbitron',monospace;font-size:14px;color:var(--cyan);
-letter-spacing:6px;animation:loadPulse 1.5s ease-in-out infinite;
-}
-.loading-bar{
-width:200px;height:2px;background:rgba(0,229,255,.1);border-radius:1px;overflow:hidden;
-}
-.loading-bar-fill{
-width:0%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));
-box-shadow:0 0 10px var(--cyan);transition:width .3s ease;
-}
-@keyframes loadPulse{0%,100%{opacity:.5}50%{opacity:1}}
-
-@media(max-width:600px){
-.tooltip{width:220px;padding:12px 14px}
-.tooltip-title{font-size:10px}
-.tooltip-desc{font-size:11px}
-.node-dot{width:10px;height:10px}
-.node-dot::before{top:-5px;left:-5px;width:20px;height:20px}
-.node-dot::after{display:none}
-}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a0a12;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#00e5ff}
+  #cerebro-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
+  .title{position:fixed;top:20px;width:100%;text-align:center;z-index:10;pointer-events:none}
+  .title h1{font-size:2.2rem;letter-spacing:6px;text-transform:uppercase;color:#00e5ff;text-shadow:0 0 20px #00e5ff,0 0 40px #00e5ff,0 0 80px #0080ff;font-weight:300}
+  .title p{font-size:.85rem;color:#00e5ff88;margin-top:6px;letter-spacing:3px}
+  .status-bar{position:fixed;bottom:0;left:0;width:100%;z-index:10;background:linear-gradient(180deg,transparent,#0a0a12ee);padding:14px 30px;display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:#00e5ff99;border-top:1px solid #00e5ff15}
+  .status-bar .status-dot{width:8px;height:8px;border-radius:50%;background:#00e5ff;box-shadow:0 0 8px #00e5ff;display:inline-block;margin-right:6px;animation:pulse-dot 2s infinite}
+  @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+  .tooltip{position:fixed;z-index:100;background:rgba(0,20,40,.92);border:1px solid #00e5ff55;border-radius:10px;padding:14px 18px;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(10px);max-width:280px;box-shadow:0 0 30px #00e5ff22}
+  .tooltip h3{font-size:1rem;color:#00e5ff;margin-bottom:4px;font-weight:500}
+  .tooltip p{font-size:.78rem;color:#00e5ffaa;line-height:1.4}
+  .tooltip a{color:#00e5ff;text-decoration:underline;font-size:.72rem}
 </style>
 </head>
 <body>
-
-<canvas id="bg-canvas"></canvas>
-<div class="grid-overlay"></div>
-<div class="scanline"></div>
-
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
-
-<div class="hex-deco" style="width:80px;height:80px;top:15%;left:8%;animation-delay:-2s"></div>
-<div class="hex-deco" style="width:60px;height:60px;top:70%;left:5%;animation-delay:-4s"></div>
-<div class="hex-deco" style="width:100px;height:100px;top:20%;right:6%;animation-delay:-1s"></div>
-<div class="hex-deco" style="width:50px;height:50px;top:65%;right:10%;animation-delay:-3s"></div>
-
-<h1 class="title">Cérebro Digital</h1>
-<div class="rotation-display" id="rotDisplay">X: 0.0° Y: 0.0°</div>
-
-<div class="scene-container" id="scene">
-<div class="brain-wrapper" id="brain">
-<div class="outer-ring"></div>
-<div class="outer-ring-2"></div>
-<div class="brain-core"></div>
-<div class="hemisphere-line"></div>
-
-<svg class="brain-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<filter id="glow">
-<feGaussianBlur stdDeviation="3" result="blur"/>
-<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-</filter>
-<filter id="glowStrong">
-<feGaussianBlur stdDeviation="6" result="blur"/>
-<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-</filter>
-</defs>
-
-<!-- Left hemisphere circuits -->
-<path class="circuit-path" d="M200,80 Q170,100 150,140 Q130,180 140,220 Q150,260 180,290 Q190,300 200,320"/>
-<path class="circuit-path green" d="M195,100 Q160,130 130,170 Q110,200 120,240 Q130,270 160,300"/>
-<path class="circuit-path" d="M190,120 Q150,150 120,190 Q100,230 110,270 Q120,300 150,320"/>
-<path class="circuit-path purple slow" d="M185,90 Q140,120 110,160 Q90,200 100,250 Q110,290 140,330"/>
-<path class="circuit-path" d="M200,150 Q175,160 160,180 Q145,200 150,230 Q155,260 175,280"/>
-
-<!-- Right hemisphere circuits -->
-<path class="circuit-path" d="M200,80 Q230,100 250,140 Q270,180 260,220 Q250,260 220,290 Q210,300 200,320"/>
-<path class="circuit-path green" d="M205,100 Q240,130 270,170 Q290,200 280,240 Q270,270 240,300"/>
-<path class="circuit-path" d="M210,120 Q250,150 280,190 Q300,230 290,270 Q280,300 250,320"/>
-<path class="circuit-path purple slow" d="M215,90 Q260,120 290,160 Q310,200 300,250 Q290,290 260,330"/>
-<path class="circuit-path" d="M200,150 Q225,160 240,180 Q255,200 250,230 Q245,260 225,280"/>
-
-<!-- Cross connections -->
-<path class="circuit-path purple" d="M150,180 Q175,190 200,185 Q225,190 250,180"/>
-<path class="circuit-path" d="M140,230 Q170,240 200,235 Q230,240 260,230"/>
-<path class="circuit-path green slow" d="M160,270 Q180,275 200,272 Q220,275 240,270"/>
-
-<!-- Horizontal rings -->
-<ellipse cx="200" cy="200" rx="80" ry="30" class="circuit-path" style="opacity:.2"/>
-<ellipse cx="200" cy="200" rx="100" ry="40" class="circuit-path purple" style="opacity:.15"/>
-<ellipse cx="200" cy="200" rx="60" ry="25" class="circuit-path green" style="opacity:.2"/>
-
-<!-- Circuit nodes -->
-<circle class="circuit-node" cx="150" cy="140" r="3"/>
-<circle class="circuit-node green" cx="130" cy="170" r="2.5"/>
-<circle class="circuit-node" cx="120" cy="220" r="3"/>
-<circle class="circuit-node purple" cx="140" cy="260" r="2"/>
-<circle class="circuit-node" cx="170" cy="300" r="2.5"/>
-<circle class="circuit-node green" cx="250" cy="140" r="3"/>
-<circle class="circuit-node" cx="270" cy="170" r="2.5"/>
-<circle class="circuit-node purple" cx="280" cy="220" r="3"/>
-<circle class="circuit-node" cx="260" cy="260" r="2"/>
-<circle class="circuit-node green" cx="230" cy="300" r="2.5"/>
-<circle class="circuit-node" cx="200" cy="100" r="3.5" style="filter:url(#glowStrong)"/>
-<circle class="circuit-node purple" cx="200" cy="300" r="3" style="filter:url(#glowStrong)"/>
-<circle class="circuit-node green" cx="160" cy="180" r="2"/>
-<circle class="circuit-node" cx="240" cy="180" r="2"/>
-<circle class="circuit-node purple" cx="200" cy="235" r="2.5" style="filter:url(#glowStrong)"/>
-<circle class="circuit-node" cx="110" cy="200" r="2"/>
-<circle class="circuit-node green" cx="290" cy="200" r="2"/>
-<circle class="circuit-node" cx="200" cy="150" r="2"/>
-<circle class="circuit-node purple" cx="200" cy="280" r="2"/>
-<circle class="circuit-node" cx="150" cy="150" r="1.5"/>
-<circle class="circuit-node green" cx="250" cy="150" r="1.5"/>
-<circle class="circuit-node" cx="150" cy="250" r="1.5"/>
-<circle class="circuit-node purple" cx="250" cy="250" r="1.5"/>
-
-<!-- Center core glow -->
-<circle cx="200" cy="200" r="8" fill="url(#coreGrad)" style="filter:url(#glowStrong)">
-<animate attributeName="r" values="6;10;6" dur="3s" repeatCount="indefinite"/>
-<animate attributeName="opacity" values=".3;.7;.3" dur="3s" repeatCount="indefinite"/>
-</circle>
-<defs>
-<radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
-<stop offset="0%" stop-color="#00e5ff" stop-opacity=".8"/>
-<stop offset="50%" stop-color="#00ff88" stop-opacity=".3"/>
-<stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-</radialGradient>
-</defs>
-</svg>
-
-<!-- Project nodes -->
-<div class="project-node" style="top:8%;left:15%;--float-delay:0s">
-<div class="node-dot"></div>
-<div class="tooltip">
-<div class="tooltip-title">🍷 Adega To Chegando</div>
-<div class="tooltip-desc">Plataforma de venda de vinhos e bebidas com catálogo completo e carrinho de compras.</div>
-<div class="tooltip-tech">React • Node.js • PostgreSQL • Render</div>
-<div class="tooltip-url"><a href="https://estoque-distribuidora-th3q.onrender.com/" target="_blank" rel="noopener">estoque-distribuidora-th3q.onrender.com</a></div>
+<div class="title">
+  <h1>Cérebro Digital</h1>
+  <p>SISTEMA INTEGRADO DE PROJETOS</p>
 </div>
+<canvas id="cerebro-canvas"></canvas>
+<div class="tooltip" id="tooltip">
+  <h3 id="tt-title"></h3>
+  <p id="tt-desc"></p>
+  <a id="tt-link" href="#" target="_blank">Acessar projeto</a>
 </div>
-
-<div class="project-node" style="top:5%;right:12%">
-<div class="node-dot"></div>
-<div class="tooltip">
-<div class="tooltip-title">💕 Para Myrella</div>
-<div class="tooltip-desc">Landing page especial com design romântico e animações suaves.</div>
-<div class="tooltip-tech">HTML • CSS • JavaScript • Render</div>
-<div class="tooltip-url"><a href="https://landing-page-temp.onrender.com/" target="_blank" rel="noopener">landing-page-temp.onrender.com</a></div>
-</div>
-</div>
-
-<div class="project-node" style="top:40%;left:2%">
-<div class="node-dot"></div>
-<div class="tooltip">
-<div class="tooltip-title">🧬 Biomedicina</div>
-<div class="tooltip-desc">Portal informativo sobre biomedicina com conteúdo acadêmico e visual.</div>
-<div class="tooltip-tech">HTML • CSS • JavaScript • Render</div>
-<div class="tooltip-url"><a href="https://landing-page-temp.onrender.com/" target="_blank" rel="noopener">landing-page-temp.onrender.com</a></div>
-</div>
-</div>
-
-<div class="project-node" style="top:45%;right:0%">
-<div class="node-dot"></div>
-<div class="tooltip">
-<div class="tooltip-title">📦 Controle de Estoque</div>
-<div class="tooltip-desc">Sistema completo de gestão de estoque para distribuidora com relatórios e alertas.</div>
-<div class="tooltip-tech">JavaScript • Node.js • Express • PostgreSQL</div>
-<div class="tooltip-url"><a href="https://estoque-distribuidora-th3q.onrender.com/consumidor.html" target="_blank" rel="noopener">estoque-distribuidora-th3q.onrender.com/consumidor</a></div>
-</div>
-</div>
-
-<div class="project-node" style="bottom:12%;left:8%">
-<div class="node-dot"></div>
-<div class="tooltip">
-<div class="tooltip-title">⚡ API REST</div>
-<div class="tooltip-desc">API RESTful para consultas de saúde do sistema e dados em tempo real.</div>
-<div class="tooltip-tech">Node.js • Express • REST • JSON</div>
-<div class="tooltip-url"><a href="https://estoque-distribuidora-th3q.onrender.com/api/health" target="_blank" rel="noopener">/api/health</a></div>
-</div>
-</div>
-
-<div class="project-node" style="bottom:15%;right:10%">
-<div class="node-dot"></div>
-<div class="tooltip">
-<div class="tooltip-title">🚀 Deploy Automático</div>
-<div class="tooltip-desc">Pipeline de deploy contínuo com integração direta do GitHub.</div>
-<div class="tooltip-tech">Render • GitHub Actions • CI/CD</div>
-<div class="tooltip-url"><a href="https://render.com" target="_blank" rel="noopener">render.com</a></div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="bottom-bar">
 <div class="status-bar">
-<div class="status-item"><div class="status-dot"></div>SISTEMA ONLINE</div>
-<div class="status-item"><div class="status-dot" style="animation-delay:-.7s"></div>6 PROJETOS ATIVOS</div>
-<div class="status-item"><div class="status-dot" style="animation-delay:-1.4s"></div>MEMÓRIA: 100%</div>
-</div>
-<div class="instructions">⟐ ARRASTE PARA ROTACIONAR ⟐</div>
+  <div><span class="status-dot"></span>SISTEMA ONLINE — TODOS OS MÓDULOS OPERACIONAIS</div>
+  <div id="clock"></div>
 </div>
 
-<!-- Loading -->
-<div class="loading-overlay" id="loadingOverlay">
-<div class="loading-text">INICIALIZANDO CÉREBRO DIGITAL</div>
-<div class="loading-bar"><div class="loading-bar-fill" id="loadingBar"></div></div>
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
-const brain=document.getElementById('brain');
-const scene=document.getElementById('scene');
-const rotDisplay=document.getElementById('rotDisplay');
+  const W=()=>window.innerWidth, H=()=>window.innerHeight;
+  const canvas=document.getElementById('cerebro-canvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setSize(W(),H());
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setClearColor(0x0a0a12,1);
 
-let rotX=-15,rotY=0;
-let autoRot=true;
-let isDragging=false;
-let lastX=0,lastY=0;
-let targetRotX=-15,targetRotY=0;
-let velocity={x:0,y:0};
-let loadProgress=0;
-const loadBar=document.getElementById('loadingBar');
-const overlay=document.getElementById('loadingOverlay');
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x0a0a12,0.035);
 
-function updateLoading(){
-loadProgress+=Math.random()*15+5;
-if(loadProgress>=100){
-loadProgress=100;
-loadBar.style.width='100%';
-setTimeout(()=>overlay.classList.add('hidden'),400);
-return;
-}
-loadBar.style.width=loadProgress+'%';
-requestAnimationFrame(()=>setTimeout(updateLoading,100+Math.random()*200));
-}
-setTimeout(updateLoading,300);
+  const camera=new THREE.PerspectiveCamera(50,W()/H(),0.1,1000);
+  camera.position.set(0,0,18);
 
-function applyTransform(){
-brain.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';
-rotDisplay.textContent='X: '+rotX.toFixed(1)+'° Y: '+rotY.toFixed(1)+'°';
-}
+  const ambientLight=new THREE.AmbientLight(0x00e5ff,0.15);
+  scene.add(ambientLight);
+  const pointLight=new THREE.PointLight(0x00e5ff,1.2,50);
+  pointLight.position.set(0,5,10);
+  scene.add(pointLight);
+  const pointLight2=new THREE.PointLight(0x0080ff,0.8,40);
+  pointLight2.position.set(-8,-3,5);
+  scene.add(pointLight2);
 
-scene.addEventListener('mousedown',e=>{
-isDragging=true;
-autoRot=false;
-lastX=e.clientX;
-lastY=e.clientY;
-velocity={x:0,y:0};
-e.preventDefault();
-});
+  // --- BRAIN CONSTRUCTION ---
+  const brainGroup=new THREE.Group();
+  scene.add(brainGroup);
 
-document.addEventListener('mousemove',e=>{
-if(!isDragging)return;
-const dx=e.clientX-lastX;
-const dy=e.clientY-lastY;
-targetRotY+=dx*0.4;
-targetRotX-=dy*0.4;
-targetRotX=Math.max(-80,Math.min(80,targetRotX));
-velocity.x=dy*0.4;
-velocity.y=dx*0.4;
-lastX=e.clientX;
-lastY=e.clientY;
-});
+  function createBrainHemisphere(side){
+    const group=new THREE.Group();
+    const sign=side==='left'?-1:1;
 
-document.addEventListener('mouseup',()=>{
-if(isDragging){
-isDragging=false;
-setTimeout(()=>{autoRot=true},3000);
-}
-});
+    const wireMat=new THREE.MeshPhongMaterial({
+      color:0x00e5ff,
+      emissive:0x003344,
+      wireframe:true,
+      transparent:true,
+      opacity:0.35,
+      shininess:80
+    });
+    const glowMat=new THREE.MeshPhongMaterial({
+      color:0x00e5ff,
+      emissive:0x00e5ff,
+      transparent:true,
+      opacity:0.08,
+      side:THREE.DoubleSide
+    });
+    const outerGlow=new THREE.MeshPhongMaterial({
+      color:0x00e5ff,
+      emissive:0x00e5ff,
+      transparent:true,
+      opacity:0.04,
+      side:THREE.BackSide
+    });
 
-scene.addEventListener('touchstart',e=>{
-isDragging=true;
-autoRot=false;
-lastX=e.touches[0].clientX;
-lastY=e.touches[0].clientY;
-velocity={x:0,y:0};
-},{passive:true});
+    // Main hemisphere - use scaled sphere
+    const mainGeo=new THREE.SphereGeometry(3.2,32,24);
+    const mainMesh=new THREE.Mesh(mainGeo,wireMat);
+    mainMesh.scale.set(1,0.85,1.15);
+    mainMesh.position.x=sign*1.6;
+    group.add(mainMesh);
 
-document.addEventListener('touchmove',e=>{
-if(!isDragging)return;
-const dx=e.touches[0].clientX-lastX;
-const dy=e.touches[0].clientY-lastY;
-targetRotY+=dx*0.4;
-targetRotX-=dy*0.4;
-targetRotX=Math.max(-80,Math.min(80,targetRotX));
-velocity.x=dy*0.4;
-velocity.y=dx*0.4;
-lastX=e.touches[0].clientX;
-lastY=e.touches[0].clientY;
-},{passive:true});
+    // Outer glow shell
+    const shellGeo=new THREE.SphereGeometry(3.5,20,16);
+    const shellMesh=new THREE.Mesh(shellGeo,outerGlow);
+    shellMesh.scale.set(1,0.85,1.15);
+    shellMesh.position.x=sign*1.6;
+    group.add(shellMesh);
 
-document.addEventListener('touchend',()=>{
-if(isDragging){
-isDragging=false;
-setTimeout(()=>{autoRot=true},3000);
-}
-});
+    // Frontal lobe bump
+    const frontGeo=new THREE.SphereGeometry(2.2,20,16);
+    const frontMesh=new THREE.Mesh(frontGeo,wireMat);
+    frontMesh.scale.set(1,0.9,0.9);
+    frontMesh.position.set(sign*0.9,0.6,2.0);
+    group.add(frontMesh);
 
-function animate(){
-if(autoRot){
-targetRotY+=0.15;
-if(targetRotX>-15)targetRotX-=0.02;
-else if(targetRotX<-15)targetRotX+=0.02;
-}
+    // Frontal glow
+    const frontGlow=new THREE.Mesh(frontGeo.clone(),glowMat);
+    frontGlow.scale.copy(frontMesh.scale);
+    frontGlow.position.copy(frontMesh.position);
+    group.add(frontGlow);
 
-if(!isDragging){
-velocity.x*=0.95;
-velocity.y*=0.95;
-targetRotY+=velocity.y*0.1;
-targetRotX-=velocity.x*0.1;
-targetRotX=Math.max(-80,Math.min(80,targetRotX));
-}
+    // Temporal lobe
+    const tempGeo=new THREE.SphereGeometry(1.8,16,12);
+    const tempMesh=new THREE.Mesh(tempGeo,wireMat);
+    tempMesh.scale.set(1.1,0.7,1.0);
+    tempMesh.position.set(sign*2.8,-0.8,0.3);
+    group.add(tempMesh);
 
-rotX+=(targetRotX-rotX)*0.08;
-rotY+=(targetRotY-rotY)*0.08;
+    // Parietal lobe
+    const parGeo=new THREE.SphereGeometry(2.0,16,12);
+    const parMesh=new THREE.Mesh(parGeo,wireMat);
+    parMesh.scale.set(0.9,0.8,1.0);
+    parMesh.position.set(sign*1.2,1.8,-0.8);
+    group.add(parMesh);
 
-applyTransform();
-requestAnimationFrame(animate);
-}
-animate();
+    // Occipital lobe
+    const occGeo=new THREE.SphereGeometry(1.6,16,12);
+    const occMesh=new THREE.Mesh(occGeo,wireMat);
+    occMesh.scale.set(0.8,0.85,1.0);
+    occMesh.position.set(sign*1.0,0.4,-2.8);
+    group.add(occMesh);
 
-// Particle canvas
-const canvas=document.getElementById('bg-canvas');
-const ctx=canvas.getContext('2d');
-let particles=[];
-function resizeCanvas(){
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize',resizeCanvas);
+    // Cerebellum
+    const cerGeo=new THREE.SphereGeometry(1.3,16,12);
+    const cerMesh=new THREE.Mesh(cerGeo,wireMat);
+    cerMesh.scale.set(0.9,0.8,0.8);
+    cerMesh.position.set(sign*0.6,-2.2,-2.0);
+    group.add(cerMesh);
 
-class Particle{
-constructor(){
-this.reset();
-}
-reset(){
-this.x=Math.random()*canvas.width;
-this.y=Math.random()*canvas.height;
-this.size=Math.random()*2+0.5;
-this.speedX=(Math.random()-0.5)*0.3;
-this.speedY=(Math.random()-0.5)*0.3;
-this.opacity=Math.random()*0.5+0.1;
-this.color=Math.random()>0.5?'0,229,255':'0,255,136';
-this.pulse=Math.random()*Math.PI*2;
-}
-update(){
-this.x+=this.speedX;
-this.y+=this.speedY;
-this.pulse+=0.02;
-if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height){
-this.reset();
-}
-}
-draw(){
-const pulseOpacity=this.opacity*(0.5+Math.sin(this.pulse)*0.5);
-ctx.beginPath();
-ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-ctx.fillStyle='rgba('+this.color+','+pulseOpacity+')';
-ctx.fill();
-ctx.beginPath();
-ctx.arc(this.x,this.y,this.size*3,0,Math.PI*2);
-ctx.fillStyle='rgba('+this.color+','+pulseOpacity*0.1+')';
-ctx.fill();
-}
-}
+    // Surface detail bumps
+    for(let i=0;i<35;i++){
+      const r=0.2+Math.random()*0.5;
+      const bumpGeo=new THREE.SphereGeometry(r,8,6);
+      const bumpMat=new THREE.MeshPhongMaterial({
+        color:0x00e5ff,
+        emissive:0x002233,
+        wireframe:true,
+        transparent:true,
+        opacity:0.2+Math.random()*0.2
+      });
+      const bump=new THREE.Mesh(bumpGeo,bumpMat);
+      const theta=Math.random()*Math.PI;
+      const phi=Math.random()*Math.PI*2;
+      const rad=2.8+Math.random()*0.6;
+      bump.position.set(
+        sign*1.6+rad*Math.sin(theta)*Math.cos(phi)*0.7,
+        rad*Math.cos(theta)*0.85,
+        rad*Math.sin(theta)*Math.sin(phi)*1.15
+      );
+      group.add(bump);
+    }
 
-for(let i=0;i<80;i++)particles.push(new Particle());
+    // Sulci lines (brain folds)
+    const lineMat=new THREE.LineBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.5});
+    for(let i=0;i<12;i++){
+      const pts=[];
+      const startTheta=Math.random()*Math.PI;
+      const startPhi=Math.random()*Math.PI*2;
+      for(let j=0;j<15;j++){
+        const t=j/14;
+        const theta=startTheta+t*1.2-0.6;
+        const phi=startPhi+Math.sin(t*Math.PI)*0.8;
+        const r=3.0+Math.sin(t*Math.PI)*0.3;
+        pts.push(new THREE.Vector3(
+          sign*1.6+r*Math.sin(theta)*Math.cos(phi)*0.7,
+          r*Math.cos(theta)*0.85,
+          r*Math.sin(theta)*Math.sin(phi)*1.15
+        ));
+      }
+      const curve=new THREE.CatmullRomCurve3(pts);
+      const geo=new THREE.TubeGeometry(curve,20,0.02,4,false);
+      const line=new THREE.Line(geo,lineMat);
+      group.add(line);
+    }
 
-function drawParticles(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-particles.forEach(p=>{p.update();p.draw()});
+    // Internal structure lines
+    const intMat=new THREE.LineBasicMaterial({color:0x0080ff,transparent:true,opacity:0.25});
+    for(let i=0;i<8;i++){
+      const pts=[];
+      for(let j=0;j<10;j++){
+        const t=j/9;
+        pts.push(new THREE.Vector3(
+          sign*(0.5+t*2.5),
+          (Math.random()-0.5)*3,
+          (Math.random()-0.5)*3
+        ));
+      }
+      const curve=new THREE.CatmullRomCurve3(pts);
+      const geo=new THREE.TubeGeometry(curve,15,0.015,4,false);
+      const line=new THREE.Line(geo,intMat);
+      group.add(line);
+    }
 
-// Draw connections between nearby particles
-for(let i=0;i<particles.length;i++){
-for(let j=i+1;j<particles.length;j++){
-const dx=particles[i].x-particles[j].x;
-const dy=particles[i].y-particles[j].y;
-const dist=Math.sqrt(dx*dx+dy*dy);
-if(dist<120){
-ctx.beginPath();
-ctx.moveTo(particles[i].x,particles[i].y);
-ctx.lineTo(particles[j].x,particles[j].y);
-ctx.strokeStyle='rgba(0,229,255,'+(0.03*(1-dist/120))+')';
-ctx.lineWidth=0.5;
-ctx.stroke();
-}
-}
-}
-requestAnimationFrame(drawParticles);
-}
-drawParticles();
+    return group;
+  }
+
+  const leftHemi=createBrainHemisphere('left');
+  const rightHemi=createBrainHemisphere('right');
+  brainGroup.add(leftHemi);
+  brainGroup.add(rightHemi);
+
+  // Central gap line
+  const gapMat=new THREE.LineBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.4});
+  for(let i=0;i<6;i++){
+    const pts=[];
+    for(let j=0;j<20;j++){
+      const t=j/19;
+      pts.push(new THREE.Vector3(
+        0,
+        (t-0.5)*5+Math.sin(t*Math.PI*3+i)*0.1,
+        (t-0.5)*5
+      ));
+    }
+    const curve=new THREE.CatmullRomCurve3(pts);
+    const geo=new THREE.TubeGeometry(curve,20,0.01,4,false);
+    brainGroup.add(new THREE.Line(geo,gapMat));
+  }
+
+  // --- NEURAL NETWORK LINES inside brain ---
+  const neuralMat=new THREE.LineBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.3});
+  for(let i=0;i<40;i++){
+    const pts=[];
+    const sx=(Math.random()-0.5)*4;
+    const sy=(Math.random()-0.5)*4;
+    const sz=(Math.random()-0.5)*4;
+    pts.push(new THREE.Vector3(sx,sy,sz));
+    for(let j=1;j<6;j++){
+      pts.push(new THREE.Vector3(
+        sx+(Math.random()-0.5)*3,
+        sy+(Math.random()-0.5)*3,
+        sz+(Math.random()-0.5)*3
+      ));
+    }
+    const curve=new THREE.CatmullRomCurve3(pts);
+    const geo=new THREE.TubeGeometry(curve,15,0.008,4,false);
+    brainGroup.add(new THREE.Line(geo,neuralMat));
+  }
+
+  // --- GLOWING NODES on brain surface ---
+  const nodePositions=[];
+  const nodesGroup=new THREE.Group();
+  brainGroup.add(nodesGroup);
+
+  for(let i=0;i<60;i++){
+    const geo=new THREE.SphereGeometry(0.06+Math.random()*0.08,8,6);
+    const mat=new THREE.MeshBasicMaterial({
+      color:0x00e5ff,
+      transparent:true,
+      opacity:0.6+Math.random()*0.4
+    });
+    const node=new THREE.Mesh(geo,mat);
+    const side=Math.random()>0.5?1:-1;
+    const theta=Math.random()*Math.PI;
+    const phi=Math.random()*Math.PI*2;
+    const r=2.8+Math.random()*0.8;
+    node.position.set(
+      side*1.6+r*Math.sin(theta)*Math.cos(phi)*0.7,
+      r*Math.cos(theta)*0.85,
+      r*Math.sin(theta)*Math.sin(phi)*1.15
+    );
+    nodesGroup.add(node);
+    nodePositions.push({mesh:node,baseOpacity:mat.opacity,phase:Math.random()*Math.PI*2});
+  }
+
+  // --- BACKGROUND STARS ---
+  const starsGeo=new THREE.BufferGeometry();
+  const starCount=1500;
+  const starPositions=new Float32Array(starCount*3);
+  const starColors=new Float32Array(starCount*3);
+  for(let i=0;i<starCount;i++){
+    starPositions[i*3]=(Math.random()-0.5)*100;
+    starPositions[i*3+1]=(Math.random()-0.5)*100;
+    starPositions[i*3+2]=(Math.random()-0.5)*100;
+    const c=Math.random()>0.8?1:0.5+Math.random()*0.5;
+    starColors[i*3]=0;c*0.2;
+    starColors[i*3+1]=c*0.6;
+    starColors[i*3+2]=c;
+  }
+  starsGeo.setAttribute('position',new THREE.BufferAttribute(starPositions,3));
+  starsGeo.setAttribute('color',new THREE.BufferAttribute(starColors,3));
+  const starsMat=new THREE.PointsMaterial({size:0.08,vertexColors:true,transparent:true,opacity:0.8});
+  const stars=new THREE.Points(starsGeo,starsMat);
+  scene.add(stars);
+
+  // --- PROJECT NODES ---
+  const projects=[
+    {emoji:'🍷',name:'Adega To Chegando',desc:'Sistema de gestão para distribuidora de bebidas',url:'https://estoque-distribuidora-th3q.onrender.com/'},
+    {emoji:'💕',name:'Para Myrella',desc:'Landing page dedicada',url:'https://landing-page-temp.onrender.com/'},
+    {emoji:'🧬',name:'Biomedicina',desc:'Plataforma de biomedicina',url:'https://landing-page-temp.onrender.com/'},
+    {emoji:'📦',name:'Controle de Estoque',desc:'Módulo de estoque e consumidor',url:'https://estoque-distribuidora-th3q.onrender.com/consumidor.html'},
+    {emoji:'⚡',name:'API REST',desc:'Endpoint de saúde da API',url:'https://estoque-distribuidora-th3q.onrender.com/api/health'},
+    {emoji:'🚀',name:'Deploy',desc:'Plataforma de deploy Render',url:'https://render.com'}
+  ];
+
+  const projectNodes=[];
+  const projectGroup=new THREE.Group();
+  scene.add(projectGroup);
+
+  projects.forEach((proj,i)=>{
+    const group=new THREE.Group();
+
+    // Orbit ring
+    const ringGeo=new THREE.RingGeometry(6.5,6.7,64);
+    const ringMat=new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.08,side:THREE.DoubleSide});
+    // We'll position rings per node
+
+    // Node sphere
+    const sphereGeo=new THREE.SphereGeometry(0.3,16,12);
+    const sphereMat=new THREE.MeshPhongMaterial({
+      color:0x00e5ff,
+      emissive:0x00e5ff,
+      emissiveIntensity:0.5,
+      transparent:true,
+      opacity:0.8
+    });
+    const sphere=new THREE.Mesh(sphereGeo,sphereMat);
+    group.add(sphere);
+
+    // Outer glow
+    const glowGeo=new THREE.SphereGeometry(0.5,12,8);
+    const glowMat=new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.15});
+    const glow=new THREE.Mesh(glowGeo,glowMat);
+    group.add(glow);
+
+    // Ring around node
+    const nodeRingGeo=new THREE.RingGeometry(0.45,0.48,32);
+    const nodeRingMat=new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.4,side:THREE.DoubleSide});
+    const nodeRing=new THREE.Mesh(nodeRingGeo,nodeRingMat);
+    group.add(nodeRing);
+
+    // Connection line to brain center
+    const lineMat=new THREE.LineBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.2});
+    const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,0,0)]);
+    const line=new THREE.Line(lineGeo,lineMat);
+    scene.add(line);
+
+    // Position in 3D orbit
+    const angle=(i/projects.length)*Math.PI*2;
+    const radius=7;
+    const yOffset=(Math.random()-0.5)*4;
+    const tilt=Math.random()*0.5;
+
+    group.userData={proj,index:i,angle,radius,yOffset,tilt,line,sphere,glow};
+    projectGroup.add(group);
+    projectNodes.push(group);
+
+    // Text sprite
+    const labelCanvas=document.createElement('canvas');
+    labelCanvas.width=512;
+    labelCanvas.height=128;
+    const ctx=labelCanvas.getContext('2d');
+    ctx.fillStyle='transparent';
+    ctx.fillRect(0,0,512,128);
+    ctx.font='bold 48px Segoe UI, sans-serif';
+    ctx.textAlign='center';
+    ctx.fillStyle='#00e5ff';
+    ctx.shadowColor='#00e5ff';
+    ctx.shadowBlur=15;
+    ctx.fillText(proj.emoji+' '+proj.name,256,70);
+    const tex=new THREE.CanvasTexture(labelCanvas);
+    const spriteMat=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:0.9});
+    const sprite=new THREE.Sprite(spriteMat);
+    sprite.scale.set(4,1,1);
+    sprite.position.y=0.8;
+    group.add(sprite);
+  });
+
+  // --- MOUSE CONTROLS ---
+  let isDragging=false;
+  let prevMouse={x:0,y:0};
+  let rotVel={x:0.002,y:0.005};
+  let targetRot={x:0,y:0};
+  let currentRot={x:0,y:0};
+
+  canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY}});
+  canvas.addEventListener('mousemove',e=>{
+    if(isDragging){
+      const dx=e.clientX-prevMouse.x;
+      const dy=e.clientY-prevMouse.y;
+      rotVel.y=dx*0.005;
+      rotVel.x=dy*0.005;
+      prevMouse={x:e.clientX,y:e.clientY};
+    }
+    // Hover detection
+    checkHover(e);
+  });
+  canvas.addEventListener('mouseup',()=>{isDragging=false});
+  canvas.addEventListener('mouseleave',()=>{isDragging=false;hideTooltip()});
+
+  // Touch support
+  canvas.addEventListener('touchstart',e=>{
+    isDragging=true;
+    prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  },{passive:true});
+  canvas.addEventListener('touchmove',e=>{
+    if(isDragging&&e.touches.length){
+      const dx=e.touches[0].clientX-prevMouse.x;
+      const dy=e.touches[0].clientY-prevMouse.y;
+      rotVel.y=dx*0.005;
+      rotVel.x=dy*0.005;
+      prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};
+    }
+  },{passive:true});
+  canvas.addEventListener('touchend',()=>{isDragging=false});
+
+  // --- TOOLTIP ---
+  const tooltip=document.getElementById('tooltip');
+  const ttTitle=document.getElementById('tt-title');
+  const ttDesc=document.getElementById('tt-desc');
+  const ttLink=document.getElementById('tt-link');
+  const raycaster=new THREE.Raycaster();
+  const mouse=new THREE.Vector2();
+  let hoveredNode=null;
+
+  function checkHover(e){
+    mouse.x=(e.clientX/W())*2-1;
+    mouse.y=-(e.clientY/H())*2+1;
+    raycaster.setFromCamera(mouse,camera);
+
+    let closest=null;
+    let closestDist=Infinity;
+
+    projectNodes.forEach(node=>{
+      const sphere=node.userData.sphere;
+      const worldPos=new THREE.Vector3();
+      sphere.getWorldPosition(worldPos);
+      const dist=raycaster.ray.distanceToPoint(worldPos);
+      if(dist<0.8&&dist<closestDist){
+        closestDist=dist;
+        closest=node;
+      }
+    });
+
+    if(closest&&closest!==hoveredNode){
+      hoveredNode=closest;
+      const p=closest.userData.proj;
+      ttTitle.textContent=p.emoji+' '+p.name;
+      ttDesc.textContent=p.desc;
+      ttLink.href=p.url;
+      tooltip.style.opacity='1';
+      tooltip.style.left=(e.clientX+15)+'px';
+      tooltip.style.top=(e.clientY-10)+'px';
+      closest.userData.sphere.material.emissiveIntensity=1;
+      closest.userData.glow.material.opacity=0.35;
+    }else if(closest){
+      tooltip.style.left=(e.clientX+15)+'px';
+      tooltip.style.top=(e.clientY-10)+'px';
+    }else if(hoveredNode){
+      hideTooltip();
+    }
+  }
+
+  function hideTooltip(){
+    tooltip.style.opacity='0';
+    if(hoveredNode){
+      hoveredNode.userData.sphere.material.emissiveIntensity=0.5;
+      hoveredNode.userData.glow.material.opacity=0.15;
+      hoveredNode=null;
+    }
+  }
+
+  // --- CLOCK ---
+  function updateClock(){
+    const now=new Date();
+    document.getElementById('clock').textContent=
+      now.toLocaleTimeString('pt-BR')+' — '+now.toLocaleDateString('pt-BR');
+  }
+  setInterval(updateClock,1000);
+  updateClock();
+
+  // --- ANIMATION LOOP ---
+  const clock=new THREE.Clock();
+
+  function animate(){
+    requestAnimationFrame(animate);
+    const t=clock.getElapsedTime();
+    const dt=clock.getDelta();
+
+    // Rotation
+    if(!isDragging){
+      rotVel.x*=0.95;
+      rotVel.y*=0.95;
+      rotVel.y+=0.0003; // auto rotation
+    }
+    currentRot.x+=rotVel.x;
+    currentRot.y+=rotVel.y;
+
+    brainGroup.rotation.x=currentRot.x;
+    brainGroup.rotation.y=currentRot.y;
+
+    // Breathing effect on brain
+    const breathe=1+Math.sin(t*0.8)*0.015;
+    brainGroup.scale.set(breathe,breathe,breathe);
+
+    // Pulse neural nodes
+    nodePositions.forEach(n=>{
+      n.mesh.material.opacity=n.baseOpacity*(0.5+0.5*Math.sin(t*2+n.phase));
+      const s=1+Math.sin(t*3+n.phase)*0.3;
+      n.mesh.scale.set(s,s,s);
+    });
+
+    // Animate project nodes in 3D orbits
+    projectNodes.forEach((node,i)=>{
+      const d=node.userData;
+      const a=d.angle+t*0.15;
+      const r=d.radius;
+      const x=Math.cos(a)*r;
+      const z=Math.sin(a)*r;
+      const y=d.yOffset+Math.sin(t*0.5+i)*0.8;
+
+      node.position.set(x,y,z);
+      node.rotation.y=t*0.5;
+      node.rotation.x=t*0.3;
+
+      // Update connection line
+      const lineGeo=new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0,0,0),
+        new THREE.Vector3(x,y,z)
+      ]);
+      d.line.geometry.dispose();
+      d.line.geometry=lineGeo;
+
+      // Pulse glow
+      d.glow.material.opacity=0.1+0.1*Math.sin(t*2+i);
+      const gs=1+Math.sin(t*2+i)*0.2;
+      d.glow.scale.set(gs,gs,gs);
+    });
+
+    // Stars subtle movement
+    stars.rotation.y=t*0.01;
+    stars.rotation.x=t*0.005;
+
+    // Camera subtle float
+    camera.position.x=Math.sin(t*0.1)*0.5;
+    camera.position.y=Math.cos(t*0.15)*0.3;
+    camera.lookAt(0,0,0);
+
+    renderer.render(scene,camera);
+  }
+
+  animate();
+
+  window.addEventListener('resize',()=>{
+    camera.aspect=W()/H();
+    camera.updateProjectionMatrix();
+    renderer.setSize(W(),H());
+  });
 })();
 </script>
 </body>
