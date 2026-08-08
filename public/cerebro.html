@@ -37,185 +37,56 @@ canvas { display: block; }
 
 #skeleton-walker {
   position: fixed;
-  bottom: 45px;
+  bottom: 50px;
   z-index: 100;
   pointer-events: none;
-  animation: skeletonWalkBack 12s linear infinite;
 }
-@keyframes skeletonWalkBack {
-  0% { left: -120px; transform: scaleX(1); }
-  49.9% { left: calc(100% + 120px); transform: scaleX(1); }
-  50% { left: calc(100% + 120px); transform: scaleX(-1); }
-  99.9% { left: -120px; transform: scaleX(-1); }
-  100% { left: -120px; transform: scaleX(1); }
+#skeleton-svg {
+  width: 120px;
+  height: 200px;
+  filter: drop-shadow(0 0 12px rgba(0,229,255,0.4)) drop-shadow(0 0 25px rgba(124,77,255,0.2));
 }
-.skeleton {
-  position: relative;
-  width: 60px;
-  height: 140px;
+.skel-eye { animation: eyeGlow 2s ease-in-out infinite; }
+@keyframes eyeGlow {
+  0%, 100% { fill: #00e5ff; filter: url(#glow); }
+  50% { fill: #ff4081; filter: url(#glowPink); }
 }
-.skel-head {
-  position: absolute;
-  width: 32px;
-  height: 36px;
-  background: #f5f5dc;
-  border-radius: 50% 50% 45% 45%;
-  left: 14px;
-  top: 0;
-  z-index: 2;
-}
-.skel-head::before {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 6px;
-  background: #1a1a1a;
-  border-radius: 50%;
-  top: 14px;
-  left: 6px;
-  box-shadow: 12px 0 0 #1a1a1a;
-}
-.skel-head::after {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 4px;
-  background: #1a1a1a;
-  border-radius: 0 0 6px 6px;
-  bottom: 8px;
-  left: 10px;
-}
-.skel-jaw {
-  position: absolute;
-  width: 24px;
-  height: 10px;
-  background: #e8e8d0;
-  border-radius: 0 0 12px 12px;
-  left: 19px;
-  top: 32px;
-  transform-origin: top center;
-  animation: jawMove 0.5s ease-in-out infinite;
-}
-@keyframes jawMove {
+.skel-jaw-bone { animation: jawAnim 0.6s ease-in-out infinite; transform-origin: 60px 62px; }
+@keyframes jawAnim {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(5deg); }
+  50% { transform: rotate(4deg); }
 }
-.skel-neck {
-  position: absolute;
-  width: 6px;
-  height: 12px;
-  background: #e8e8d0;
-  left: 27px;
-  top: 34px;
-  border-radius: 3px;
+.skel-arm-l { animation: armL 0.5s ease-in-out infinite; transform-origin: 42px 82px; }
+.skel-arm-r { animation: armR 0.5s ease-in-out infinite; transform-origin: 78px 82px; }
+@keyframes armL {
+  0%, 100% { transform: rotate(18deg); }
+  50% { transform: rotate(-18deg); }
 }
-.skel-torso {
-  position: absolute;
-  width: 28px;
-  height: 35px;
-  background: #f5f5dc;
-  border-radius: 8px 8px 4px 4px;
-  left: 16px;
-  top: 44px;
+@keyframes armR {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(18deg); }
 }
-.skel-ribs {
-  position: absolute;
-  width: 24px;
-  height: 20px;
-  border: 2px solid #d4d4c0;
-  border-radius: 0 0 12px 12px;
-  left: 18px;
-  top: 48px;
-  background: transparent;
+.skel-leg-l { animation: legL 0.5s ease-in-out infinite; transform-origin: 50px 128px; }
+.skel-leg-r { animation: legR 0.5s ease-in-out infinite; transform-origin: 70px 128px; }
+@keyframes legL {
+  0%, 100% { transform: rotate(14deg); }
+  50% { transform: rotate(-14deg); }
 }
-.skel-ribs::before, .skel-ribs::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: #d4d4c0;
-  left: -2px;
+@keyframes legR {
+  0%, 100% { transform: rotate(-14deg); }
+  50% { transform: rotate(14deg); }
 }
-.skel-ribs::before { top: 6px; }
-.skel-ribs::after { top: 12px; }
-.skel-arm {
-  position: absolute;
-  width: 8px;
-  height: 45px;
-  background: #e8e8d0;
-  border-radius: 4px;
-  left: 6px;
-  top: 46px;
-  transform-origin: top center;
-  animation: armSwingReal 0.4s ease-in-out infinite;
+.skel-body { animation: bodyBob 0.25s ease-in-out infinite; }
+@keyframes bodyBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
-.skel-arm.right {
-  left: 46px;
-  animation-delay: 0.2s;
+.skel-shadow-ground {
+  animation: shadowWalk 0.5s ease-in-out infinite;
 }
-@keyframes armSwingReal {
-  0%, 100% { transform: rotate(20deg); }
-  50% { transform: rotate(-20deg); }
-}
-.skel-hand {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: #f5f5dc;
-  border-radius: 50%;
-  bottom: -4px;
-  left: 0;
-}
-.skel-pelvis {
-  position: absolute;
-  width: 24px;
-  height: 12px;
-  background: #e8e8d0;
-  border-radius: 4px 4px 8px 8px;
-  left: 18px;
-  top: 76px;
-}
-.skel-leg {
-  position: absolute;
-  width: 10px;
-  height: 50px;
-  background: #f5f5dc;
-  border-radius: 5px;
-  left: 16px;
-  top: 86px;
-  transform-origin: top center;
-  animation: legWalkReal 0.4s ease-in-out infinite;
-}
-.skel-leg.right {
-  left: 34px;
-  animation-delay: 0.2s;
-}
-@keyframes legWalkReal {
-  0%, 100% { transform: rotate(15deg); }
-  50% { transform: rotate(-15deg); }
-}
-.skel-foot {
-  position: absolute;
-  width: 14px;
-  height: 6px;
-  background: #e8e8d0;
-  border-radius: 3px;
-  bottom: -4px;
-  left: -2px;
-}
-.skel-shadow {
-  position: absolute;
-  width: 50px;
-  height: 10px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 50%;
-  bottom: -15px;
-  left: 5px;
-  animation: shadowPulse 0.4s ease-in-out infinite;
-}
-@keyframes shadowPulse {
-  0%, 100% { transform: scaleX(1); opacity: 0.3; }
-  50% { transform: scaleX(0.8); opacity: 0.5; }
+@keyframes shadowWalk {
+  0%, 100% { rx: 28; opacity: 0.35; }
+  50% { rx: 22; opacity: 0.5; }
 }
 
 #modal-overlay {
@@ -275,27 +146,108 @@ canvas { display: block; }
 <div id="instructions">Arraste para girar &bull; Clique nos nós para acessar</div>
 
 <div id="skeleton-walker">
-  <div class="skeleton">
-    <div class="skel-head"></div>
-    <div class="skel-jaw"></div>
-    <div class="skel-neck"></div>
-    <div class="skel-torso"></div>
-    <div class="skel-ribs"></div>
-    <div class="skel-arm left">
-      <div class="skel-hand"></div>
-    </div>
-    <div class="skel-arm right">
-      <div class="skel-hand"></div>
-    </div>
-    <div class="skel-pelvis"></div>
-    <div class="skel-leg left">
-      <div class="skel-foot"></div>
-    </div>
-    <div class="skel-leg right">
-      <div class="skel-foot"></div>
-    </div>
-    <div class="skel-shadow"></div>
-  </div>
+  <svg id="skeleton-svg" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glowPink">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <linearGradient id="boneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#f0ead6"/>
+        <stop offset="50%" style="stop-color:#fff8e7"/>
+        <stop offset="100%" style="stop-color:#d4c9a8"/>
+      </linearGradient>
+      <linearGradient id="boneGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#e8dcc8"/>
+        <stop offset="100%" style="stop-color:#c9bd9e"/>
+      </linearGradient>
+    </defs>
+    <g class="skel-body">
+      <!-- Crânio -->
+      <ellipse cx="60" cy="38" rx="22" ry="26" fill="url(#boneGrad)" stroke="#c9bd9e" stroke-width="1"/>
+      <ellipse cx="60" cy="42" rx="18" ry="14" fill="#0a0a1a" opacity="0.15"/>
+      <!-- Órbitas oculares -->
+      <ellipse cx="51" cy="34" rx="7" ry="8" fill="#1a1a2e" stroke="#c9bd9e" stroke-width="0.8"/>
+      <ellipse cx="69" cy="34" rx="7" ry="8" fill="#1a1a2e" stroke="#c9bd9e" stroke-width="0.8"/>
+      <!-- Olhos brilhantes -->
+      <circle class="skel-eye" cx="51" cy="34" r="3" fill="#00e5ff" filter="url(#glow)"/>
+      <circle class="skel-eye" cx="69" cy="34" r="3" fill="#00e5ff" filter="url(#glow)"/>
+      <!-- Nariz -->
+      <path d="M57 44 L60 50 L63 44" fill="none" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Mandíbula -->
+      <g class="skel-jaw-bone">
+        <path d="M42 52 Q42 68 60 70 Q78 68 78 52" fill="none" stroke="url(#boneGrad2)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Dentes superiores -->
+        <line x1="48" y1="52" x2="48" y2="56" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+        <line x1="52" y1="52" x2="52" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+        <line x1="56" y1="52" x2="56" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+        <line x1="60" y1="52" x2="60" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+        <line x1="64" y1="52" x2="64" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+        <line x1="68" y1="52" x2="68" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+        <line x1="72" y1="52" x2="72" y2="56" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <!-- Coluna cervical -->
+      <rect x="57" y="64" width="6" height="14" rx="3" fill="url(#boneGrad2)"/>
+      <!-- Clavículas -->
+      <path d="M38 82 Q60 76 82 82" fill="none" stroke="url(#boneGrad)" stroke-width="3" stroke-linecap="round"/>
+      <!-- Costelas -->
+      <path d="M44 88 Q60 92 76 88" fill="none" stroke="url(#boneGrad2)" stroke-width="2" opacity="0.8"/>
+      <path d="M43 94 Q60 98 77 94" fill="none" stroke="url(#boneGrad2)" stroke-width="2" opacity="0.7"/>
+      <path d="M44 100 Q60 104 76 100" fill="none" stroke="url(#boneGrad2)" stroke-width="2" opacity="0.6"/>
+      <path d="M46 106 Q60 109 74 106" fill="none" stroke="url(#boneGrad2)" stroke-width="1.5" opacity="0.5"/>
+      <!-- Coluna vertebral -->
+      <rect x="57" y="82" width="6" height="46" rx="3" fill="url(#boneGrad2)"/>
+      <!-- Vértebras (detalhes) -->
+      <line x1="57" y1="88" x2="63" y2="88" stroke="#c9bd9e" stroke-width="1"/>
+      <line x1="57" y1="94" x2="63" y2="94" stroke="#c9bd9e" stroke-width="1"/>
+      <line x1="57" y1="100" x2="63" y2="100" stroke="#c9bd9e" stroke-width="1"/>
+      <line x1="57" y1="106" x2="63" y2="106" stroke="#c9bd9e" stroke-width="1"/>
+      <line x1="57" y1="112" x2="63" y2="112" stroke="#c9bd9e" stroke-width="1"/>
+      <line x1="57" y1="118" x2="63" y2="118" stroke="#c9bd9e" stroke-width="1"/>
+      <!-- Pelve -->
+      <path d="M42 128 Q42 118 60 116 Q78 118 78 128 Q70 132 60 130 Q50 132 42 128Z" fill="url(#boneGrad)" stroke="#c9bd9e" stroke-width="1"/>
+      <!-- Braço esquerdo -->
+      <g class="skel-arm-l">
+        <rect x="36" y="82" width="5" height="30" rx="2.5" fill="url(#boneGrad2)"/>
+        <rect x="34" y="110" width="5" height="28" rx="2.5" fill="url(#boneGrad2)"/>
+        <!-- Mão -->
+        <circle cx="36" cy="142" r="4" fill="url(#boneGrad)"/>
+        <line x1="33" y1="144" x2="31" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="36" y1="145" x2="35" y2="152" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="39" y1="144" x2="40" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <!-- Braço direito -->
+      <g class="skel-arm-r">
+        <rect x="79" y="82" width="5" height="30" rx="2.5" fill="url(#boneGrad2)"/>
+        <rect x="81" y="110" width="5" height="28" rx="2.5" fill="url(#boneGrad2)"/>
+        <!-- Mão -->
+        <circle cx="84" cy="142" r="4" fill="url(#boneGrad)"/>
+        <line x1="81" y1="144" x2="80" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="84" y1="145" x2="83" y2="152" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="87" y1="144" x2="88" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <!-- Perna esquerda -->
+      <g class="skel-leg-l">
+        <rect x="46" y="130" width="6" height="35" rx="3" fill="url(#boneGrad2)"/>
+        <rect x="45" y="163" width="6" height="30" rx="3" fill="url(#boneGrad2)"/>
+        <!-- Pé -->
+        <ellipse cx="48" cy="195" rx="8" ry="4" fill="url(#boneGrad)"/>
+      </g>
+      <!-- Perna direita -->
+      <g class="skel-leg-r">
+        <rect x="68" y="130" width="6" height="35" rx="3" fill="url(#boneGrad2)"/>
+        <rect x="69" y="163" width="6" height="30" rx="3" fill="url(#boneGrad2)"/>
+        <!-- Pé -->
+        <ellipse cx="72" cy="195" rx="8" ry="4" fill="url(#boneGrad)"/>
+      </g>
+    </g>
+    <!-- Sombra no chão -->
+    <ellipse class="skel-shadow-ground" cx="60" cy="198" rx="28" ry="4" fill="rgba(0,0,0,0.3)"/>
+  </svg>
 </div>
 
 <div id="status-bar">
@@ -794,6 +746,21 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
+// --- SKELETON WALKER ---
+const skel = document.getElementById('skeleton-walker');
+let skelX = -150;
+let skelDir = 1;
+const skelSpeed = 1.5;
+function animateSkeleton() {
+  skelX += skelSpeed * skelDir;
+  const maxRight = window.innerWidth + 150;
+  if (skelX > maxRight) { skelDir = -1; skel.style.transform = 'scaleX(-1)'; }
+  if (skelX < -150) { skelDir = 1; skel.style.transform = 'scaleX(1)'; }
+  skel.style.left = skelX + 'px';
+  requestAnimationFrame(animateSkeleton);
+}
+animateSkeleton();
 </script>
 </body>
 </html>
