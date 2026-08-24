@@ -559,13 +559,32 @@ document.getElementById('search').addEventListener('input', (e) => {
   });
 });
 
-// Main loop
+// Settle nodes, then stop
+let settled = false;
+let settleFrames = 0;
+const SETTLE_FRAMES = 300;
+
 function loop() {
-  physics();
-  draw();
-  requestAnimationFrame(loop);
+  if (!settled) {
+    physics();
+    draw();
+    settleFrames++;
+    if (settleFrames >= SETTLE_FRAMES) {
+      settled = true;
+      draw(); // final draw
+      return; // stop loop
+    }
+    requestAnimationFrame(loop);
+  }
 }
 loop();
+
+// Redraw only on interaction
+function redraw() { draw(); }
+canvas.addEventListener('mousemove', redraw);
+canvas.addEventListener('mouseup', redraw);
+canvas.addEventListener('wheel', redraw);
+canvas.addEventListener('click', redraw);
 </script>
 </body>
 </html>
