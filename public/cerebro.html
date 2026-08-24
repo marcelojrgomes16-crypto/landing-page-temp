@@ -6,17 +6,22 @@
 <title>Cérebro Digital</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { overflow: hidden; background: #0a0a1a; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { 
+  overflow: hidden; 
+  background: #1e1e1e; 
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  cursor: grab;
+}
+body.dragging { cursor: grabbing; }
+body.node-dragging { cursor: grabbing; }
 canvas { display: block; }
 
 #title {
   position: fixed; top: 20px; left: 0; right: 0; text-align: center;
-  font-size: 2rem; font-weight: 700; z-index: 10; pointer-events: none;
-  background: linear-gradient(90deg, #00e5ff, #7c4dff, #ff4081, #00e5ff);
-  background-size: 300% 100%;
+  font-size: 1.8rem; font-weight: 700; z-index: 10; pointer-events: none;
+  background: linear-gradient(90deg, #ff6b9d, #c44dff, #6b9dff);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   animation: shimmer 4s ease-in-out infinite;
-  text-shadow: 0 0 40px rgba(0,229,255,0.3);
   letter-spacing: 2px;
 }
 @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
@@ -24,69 +29,18 @@ canvas { display: block; }
 #status-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
   display: flex; justify-content: center; gap: 30px; padding: 12px 20px;
-  background: rgba(10,10,26,0.85); backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(0,229,255,0.15); font-size: 0.8rem; color: #8899aa;
+  background: rgba(30,30,30,0.9); backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; color: #888;
 }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: #00e676; display: inline-block; margin-right: 6px; animation: pulse-dot 2s infinite; }
+.status-dot { 
+  width: 6px; height: 6px; border-radius: 50%; background: #00e676; 
+  display: inline-block; margin-right: 6px; animation: pulse-dot 2s infinite; 
+}
 @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 #instructions {
   position: fixed; bottom: 50px; left: 0; right: 0; text-align: center;
-  font-size: 0.75rem; color: rgba(255,255,255,0.25); z-index: 10; pointer-events: none;
-}
-
-#skeleton-walker {
-  position: fixed;
-  bottom: 50px;
-  z-index: 100;
-  pointer-events: none;
-}
-#skeleton-svg {
-  width: 120px;
-  height: 200px;
-  filter: drop-shadow(0 0 12px rgba(0,229,255,0.4)) drop-shadow(0 0 25px rgba(124,77,255,0.2));
-}
-.skel-eye { animation: eyeGlow 2s ease-in-out infinite; }
-@keyframes eyeGlow {
-  0%, 100% { fill: #00e5ff; filter: url(#glow); }
-  50% { fill: #ff4081; filter: url(#glowPink); }
-}
-.skel-jaw-bone { animation: jawAnim 0.6s ease-in-out infinite; transform-origin: 60px 62px; }
-@keyframes jawAnim {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(4deg); }
-}
-.skel-arm-l { animation: armL 0.5s ease-in-out infinite; transform-origin: 42px 82px; }
-.skel-arm-r { animation: armR 0.5s ease-in-out infinite; transform-origin: 78px 82px; }
-@keyframes armL {
-  0%, 100% { transform: rotate(18deg); }
-  50% { transform: rotate(-18deg); }
-}
-@keyframes armR {
-  0%, 100% { transform: rotate(-18deg); }
-  50% { transform: rotate(18deg); }
-}
-.skel-leg-l { animation: legL 0.5s ease-in-out infinite; transform-origin: 50px 128px; }
-.skel-leg-r { animation: legR 0.5s ease-in-out infinite; transform-origin: 70px 128px; }
-@keyframes legL {
-  0%, 100% { transform: rotate(14deg); }
-  50% { transform: rotate(-14deg); }
-}
-@keyframes legR {
-  0%, 100% { transform: rotate(-14deg); }
-  50% { transform: rotate(14deg); }
-}
-.skel-body { animation: bodyBob 0.25s ease-in-out infinite; }
-@keyframes bodyBob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-.skel-shadow-ground {
-  animation: shadowWalk 0.5s ease-in-out infinite;
-}
-@keyframes shadowWalk {
-  0%, 100% { rx: 28; opacity: 0.35; }
-  50% { rx: 22; opacity: 0.5; }
+  font-size: 0.75rem; color: rgba(255,255,255,0.3); z-index: 10; pointer-events: none;
 }
 
 #modal-overlay {
@@ -96,29 +50,29 @@ canvas { display: block; }
 }
 #modal-overlay.active { display: flex; }
 #modal {
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-  border: 1px solid rgba(0,229,255,0.2); border-radius: 16px;
+  background: linear-gradient(135deg, #252525 0%, #1e1e1e 100%);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
   padding: 32px; max-width: 420px; width: 90%; text-align: center;
-  box-shadow: 0 0 60px rgba(0,229,255,0.1); animation: modal-in 0.3s ease;
+  box-shadow: 0 0 60px rgba(0,0,0,0.5); animation: modal-in 0.3s ease;
 }
 @keyframes modal-in { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
 #modal h2 { color: #fff; font-size: 1.4rem; margin-bottom: 8px; }
 #modal .modal-emoji { font-size: 3rem; margin-bottom: 12px; }
-#modal p { color: #8899aa; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
+#modal p { color: #888; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
 #modal a {
-  display: inline-block; padding: 10px 28px; background: linear-gradient(135deg, #00e5ff, #7c4dff);
+  display: inline-block; padding: 10px 28px; background: linear-gradient(135deg, #7c4dff, #c44dff);
   color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-#modal a:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,229,255,0.4); }
+#modal a:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,77,255,0.4); }
 #modal-close {
   position: absolute; top: 12px; right: 16px; background: none; border: none;
-  color: #556; font-size: 1.5rem; cursor: pointer;
+  color: #666; font-size: 1.5rem; cursor: pointer;
 }
 .modal-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 #modal-close-btn {
   padding: 10px 28px; background: transparent; border: 1px solid rgba(255,255,255,0.2);
-  color: #8899aa; border-radius: 8px; font-weight: 600; cursor: pointer;
+  color: #888; border-radius: 8px; font-weight: 600; cursor: pointer;
   transition: all 0.2s; font-size: 0.9rem;
 }
 #modal-close-btn:hover { border-color: #ff5555; color: #ff5555; }
@@ -129,132 +83,49 @@ canvas { display: block; }
 }
 #modal-vscode:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,122,204,0.4); }
 #modal-cmd {
-  padding: 10px 28px; background: transparent; border: 1px solid rgba(0,229,255,0.3);
-  color: #00e5ff; border-radius: 8px; font-weight: 600; cursor: pointer;
+  padding: 10px 28px; background: transparent; border: 1px solid rgba(124,77,255,0.3);
+  color: #c44dff; border-radius: 8px; font-weight: 600; cursor: pointer;
   transition: all 0.2s; font-size: 0.9rem;
 }
-#modal-cmd:hover { border-color: #00e5ff; background: rgba(0,229,255,0.1); }
-#modal-cmd-msg { color: #00e5ff; font-size: 0.8rem; margin-top: 12px; word-break: break-all;
-  background: rgba(0,229,255,0.05); padding: 8px 12px; border-radius: 6px;
-  border: 1px solid rgba(0,229,255,0.15); }
+#modal-cmd:hover { border-color: #c44dff; background: rgba(124,77,255,0.1); }
+#modal-cmd-msg { 
+  color: #c44dff; font-size: 0.8rem; margin-top: 12px; word-break: break-all;
+  background: rgba(124,77,255,0.05); padding: 8px 12px; border-radius: 6px;
+  border: 1px solid rgba(124,77,255,0.15); display: none;
+}
+
+#tooltip {
+  position: fixed; background: #333; color: #fff; padding: 8px 12px;
+  border-radius: 6px; font-size: 0.85rem; pointer-events: none;
+  opacity: 0; transition: opacity 0.2s; z-index: 200;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#tooltip.visible { opacity: 1; }
+
+#search {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: #333; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 10px 16px; color: #fff;
+  font-size: 0.9rem; width: 300px; z-index: 50;
+  outline: none;
+}
+#search::placeholder { color: #666; }
+#search:focus { border-color: rgba(124,77,255,0.5); }
 </style>
 </head>
 <body>
 
 <div id="title">Cérebro Digital</div>
-
-<div id="instructions">Arraste para girar &bull; Clique nos nós para acessar</div>
-
-<div id="skeleton-walker">
-  <svg id="skeleton-svg" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="3" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <filter id="glowPink">
-        <feGaussianBlur stdDeviation="4" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <linearGradient id="boneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#f0ead6"/>
-        <stop offset="50%" style="stop-color:#fff8e7"/>
-        <stop offset="100%" style="stop-color:#d4c9a8"/>
-      </linearGradient>
-      <linearGradient id="boneGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" style="stop-color:#e8dcc8"/>
-        <stop offset="100%" style="stop-color:#c9bd9e"/>
-      </linearGradient>
-    </defs>
-    <g class="skel-body">
-      <!-- Crânio -->
-      <ellipse cx="60" cy="38" rx="22" ry="26" fill="url(#boneGrad)" stroke="#c9bd9e" stroke-width="1"/>
-      <ellipse cx="60" cy="42" rx="18" ry="14" fill="#0a0a1a" opacity="0.15"/>
-      <!-- Órbitas oculares -->
-      <ellipse cx="51" cy="34" rx="7" ry="8" fill="#1a1a2e" stroke="#c9bd9e" stroke-width="0.8"/>
-      <ellipse cx="69" cy="34" rx="7" ry="8" fill="#1a1a2e" stroke="#c9bd9e" stroke-width="0.8"/>
-      <!-- Olhos brilhantes -->
-      <circle class="skel-eye" cx="51" cy="34" r="3" fill="#00e5ff" filter="url(#glow)"/>
-      <circle class="skel-eye" cx="69" cy="34" r="3" fill="#00e5ff" filter="url(#glow)"/>
-      <!-- Nariz -->
-      <path d="M57 44 L60 50 L63 44" fill="none" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
-      <!-- Mandíbula -->
-      <g class="skel-jaw-bone">
-        <path d="M42 52 Q42 68 60 70 Q78 68 78 52" fill="none" stroke="url(#boneGrad2)" stroke-width="3" stroke-linecap="round"/>
-        <!-- Dentes superiores -->
-        <line x1="48" y1="52" x2="48" y2="56" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-        <line x1="52" y1="52" x2="52" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-        <line x1="56" y1="52" x2="56" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-        <line x1="60" y1="52" x2="60" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-        <line x1="64" y1="52" x2="64" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-        <line x1="68" y1="52" x2="68" y2="57" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-        <line x1="72" y1="52" x2="72" y2="56" stroke="#fff8e7" stroke-width="2" stroke-linecap="round"/>
-      </g>
-      <!-- Coluna cervical -->
-      <rect x="57" y="64" width="6" height="14" rx="3" fill="url(#boneGrad2)"/>
-      <!-- Clavículas -->
-      <path d="M38 82 Q60 76 82 82" fill="none" stroke="url(#boneGrad)" stroke-width="3" stroke-linecap="round"/>
-      <!-- Costelas -->
-      <path d="M44 88 Q60 92 76 88" fill="none" stroke="url(#boneGrad2)" stroke-width="2" opacity="0.8"/>
-      <path d="M43 94 Q60 98 77 94" fill="none" stroke="url(#boneGrad2)" stroke-width="2" opacity="0.7"/>
-      <path d="M44 100 Q60 104 76 100" fill="none" stroke="url(#boneGrad2)" stroke-width="2" opacity="0.6"/>
-      <path d="M46 106 Q60 109 74 106" fill="none" stroke="url(#boneGrad2)" stroke-width="1.5" opacity="0.5"/>
-      <!-- Coluna vertebral -->
-      <rect x="57" y="82" width="6" height="46" rx="3" fill="url(#boneGrad2)"/>
-      <!-- Vértebras (detalhes) -->
-      <line x1="57" y1="88" x2="63" y2="88" stroke="#c9bd9e" stroke-width="1"/>
-      <line x1="57" y1="94" x2="63" y2="94" stroke="#c9bd9e" stroke-width="1"/>
-      <line x1="57" y1="100" x2="63" y2="100" stroke="#c9bd9e" stroke-width="1"/>
-      <line x1="57" y1="106" x2="63" y2="106" stroke="#c9bd9e" stroke-width="1"/>
-      <line x1="57" y1="112" x2="63" y2="112" stroke="#c9bd9e" stroke-width="1"/>
-      <line x1="57" y1="118" x2="63" y2="118" stroke="#c9bd9e" stroke-width="1"/>
-      <!-- Pelve -->
-      <path d="M42 128 Q42 118 60 116 Q78 118 78 128 Q70 132 60 130 Q50 132 42 128Z" fill="url(#boneGrad)" stroke="#c9bd9e" stroke-width="1"/>
-      <!-- Braço esquerdo -->
-      <g class="skel-arm-l">
-        <rect x="36" y="82" width="5" height="30" rx="2.5" fill="url(#boneGrad2)"/>
-        <rect x="34" y="110" width="5" height="28" rx="2.5" fill="url(#boneGrad2)"/>
-        <!-- Mão -->
-        <circle cx="36" cy="142" r="4" fill="url(#boneGrad)"/>
-        <line x1="33" y1="144" x2="31" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="36" y1="145" x2="35" y2="152" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="39" y1="144" x2="40" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-      </g>
-      <!-- Braço direito -->
-      <g class="skel-arm-r">
-        <rect x="79" y="82" width="5" height="30" rx="2.5" fill="url(#boneGrad2)"/>
-        <rect x="81" y="110" width="5" height="28" rx="2.5" fill="url(#boneGrad2)"/>
-        <!-- Mão -->
-        <circle cx="84" cy="142" r="4" fill="url(#boneGrad)"/>
-        <line x1="81" y1="144" x2="80" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="84" y1="145" x2="83" y2="152" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="87" y1="144" x2="88" y2="150" stroke="url(#boneGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-      </g>
-      <!-- Perna esquerda -->
-      <g class="skel-leg-l">
-        <rect x="46" y="130" width="6" height="35" rx="3" fill="url(#boneGrad2)"/>
-        <rect x="45" y="163" width="6" height="30" rx="3" fill="url(#boneGrad2)"/>
-        <!-- Pé -->
-        <ellipse cx="48" cy="195" rx="8" ry="4" fill="url(#boneGrad)"/>
-      </g>
-      <!-- Perna direita -->
-      <g class="skel-leg-r">
-        <rect x="68" y="130" width="6" height="35" rx="3" fill="url(#boneGrad2)"/>
-        <rect x="69" y="163" width="6" height="30" rx="3" fill="url(#boneGrad2)"/>
-        <!-- Pé -->
-        <ellipse cx="72" cy="195" rx="8" ry="4" fill="url(#boneGrad)"/>
-      </g>
-    </g>
-    <!-- Sombra no chão -->
-    <ellipse class="skel-shadow-ground" cx="60" cy="198" rx="28" ry="4" fill="rgba(0,0,0,0.3)"/>
-  </svg>
-</div>
+<input type="text" id="search" placeholder="🔍 Buscar projeto...">
+<div id="instructions">Arraste para mover &bull; Scroll para zoom &bull; Clique nos nós</div>
 
 <div id="status-bar">
   <span><span class="status-dot"></span>Sistema Online</span>
-  <span>7 Projetos Ativos</span>
+  <span>9 Projetos</span>
   <span id="clock"></span>
 </div>
+
+<div id="tooltip"></div>
 
 <div id="modal-overlay">
   <div id="modal">
@@ -263,35 +134,32 @@ canvas { display: block; }
     <h2 id="modal-title"></h2>
     <p id="modal-desc"></p>
     <div class="modal-buttons">
-      <a id="modal-link" href="#" target="_blank">🔗 Abrir no Navegador</a>
-      <button id="modal-vscode">💻 Abrir no VS Code</button>
-      <button id="modal-cmd">⌨️ Abrir no CMD</button>
+      <a id="modal-link" href="#" target="_blank">🔗 Abrir</a>
+      <button id="modal-vscode">💻 VS Code</button>
+      <button id="modal-cmd">⌨️ CMD</button>
       <button id="modal-close-btn">✕ Fechar</button>
     </div>
-    <p id="modal-cmd-msg" style="display:none;color:#00e5ff;font-size:0.8rem;margin-top:12px;word-break:break-all;"></p>
+    <p id="modal-cmd-msg"></p>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const PROJECTS = [
-  { emoji:'🍷', name:'Adega To Chegando', desc:'Sistema de controle de estoque para distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js' },
-  { emoji:'💕', name:'Para Myrella', desc:'Landing page personalizada com design moderno e interativo.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html' },
-  { emoji:'🧬', name:'Biomedicina', desc:'Plataforma de informações e serviços de biomedicina.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html' },
-  { emoji:'📦', name:'Controle de Estoque', desc:'Módulo de gestão de estoque para consumidor final.', url:'https://estoque-distribuidora-th3q.onrender.com/consumidor.html', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'public\\consumidor.html' },
-  { emoji:'💰', name:'Controle Financeiro', desc:'Sistema de controle financeiro para emprestimos e credito (Jurema).', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js' },
-  { emoji:'⚡', name:'API REST', desc:'Endpoint de health check e serviços RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js' },
-  { emoji:'🚀', name:'Deploy', desc:'Plataforma de deploy e hospedagem de aplicações.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml' }
+  { id:'cerebro', emoji:'🧠', name:'Cérebro Digital', desc:'Centro de comando.', color:'#c44dff', size:50, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
+  { id:'v8', emoji:'🏋️', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#ef4444', size:38, connections:['cerebro','deploy'] },
+  { id:'financeiro', emoji:'💰', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#fbbf24', size:35, connections:['cerebro','deploy'] },
+  { id:'estoque', emoji:'📦', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#a78bfa', size:33, connections:['cerebro','api','adega'] },
+  { id:'api', emoji:'⚡', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#f472b6', size:28, connections:['cerebro','estoque'] },
+  { id:'deploy', emoji:'🚀', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#34d399', size:30, connections:['cerebro','v8','financeiro'] },
+  { id:'myrella', emoji:'💕', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#ec4899', size:30, connections:['cerebro','landing'] },
+  { id:'adega', emoji:'🍷', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#c084fc', size:32, connections:['cerebro','estoque'] },
+  { id:'money', emoji:'💸', name:'MoneyPrinter', desc:'Vídeos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#3b82f6', size:30, connections:['cerebro'] },
+  { id:'landing', emoji:'🌐', name:'Landing', desc:'Página temporária.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#6b7280', size:25, connections:['cerebro','myrella'] }
 ];
 
 // Clock
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR');
-}
+function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR'); }
 updateClock(); setInterval(updateClock, 1000);
-
-
 
 // Modal
 const overlay = document.getElementById('modal-overlay');
@@ -303,465 +171,401 @@ function openModal(p) {
   document.getElementById('modal-emoji').textContent = p.emoji;
   document.getElementById('modal-title').textContent = p.name;
   document.getElementById('modal-desc').textContent = p.desc;
-  document.getElementById('modal-link').href = p.url;
+  document.getElementById('modal-link').href = p.url || '#';
   document.getElementById('modal-cmd-msg').style.display = 'none';
-
-  // VS Code button
   document.getElementById('modal-vscode').onclick = () => {
-    const cmd = `code "${p.dir}"`;
-    navigator.clipboard.writeText(cmd).then(() => {
+    navigator.clipboard.writeText(`code "${p.dir}"`).then(() => {
       const msg = document.getElementById('modal-cmd-msg');
       msg.style.display = 'block';
-      msg.innerHTML = '📋 Comando copiado! Cole no terminal:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">' + cmd + '</code>';
+      msg.innerHTML = '📋 Copiado: <code>code "' + p.dir + '"</code>';
     });
   };
-
-  // CMD button
   document.getElementById('modal-cmd').onclick = () => {
-    const cmd = `cd /d "${p.dir}" && code "${p.file}"`;
-    navigator.clipboard.writeText(cmd).then(() => {
+    navigator.clipboard.writeText(`cd /d "${p.dir}" && code "${p.file}"`).then(() => {
       const msg = document.getElementById('modal-cmd-msg');
       msg.style.display = 'block';
-      msg.innerHTML = '✅ Comando copiado! Pressione <b style="color:#ff5555;">Win+R</b> → digite <b style="color:#ff5555;">cmd</b> → <b style="color:#ff5555;">Enter</b> → cole com <b style="color:#ff5555;">Ctrl+V</b>:<br><code style="color:#fff;background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:3px;display:inline-block;margin-top:6px;">' + cmd + '</code>';
+      msg.innerHTML = '✅ Copiado!';
     });
   };
-
   overlay.classList.add('active');
 }
 
-// Scene
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a0a1a);
-scene.fog = new THREE.FogExp2(0x0a0a1a, 0.012);
+// Canvas
+const canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize();
+addEventListener('resize', resize);
 
-const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 200);
-camera.position.set(0, 0, 22);
+// Camera
+let camX = 0, camY = 0, camZoom = 1;
+let camTargetX = 0, camTargetY = 0, camTargetZoom = 1;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
-document.body.appendChild(renderer.domElement);
+// Nodes with physics
+const nodes = PROJECTS.map((p, i) => ({
+  ...p,
+  x: (Math.random() - 0.5) * 600,
+  y: (Math.random() - 0.5) * 400,
+  vx: 0, vy: 0,
+  fx: 0, fy: 0,
+  pinned: false
+}));
 
-// Lights
-scene.add(new THREE.AmbientLight(0x334455, 0.6));
-const pLight = new THREE.PointLight(0xff6644, 1.5, 30);
-pLight.position.set(0, 0, 0);
-scene.add(pLight);
-const pLight2 = new THREE.PointLight(0x4488ff, 0.8, 40);
-pLight2.position.set(5, 5, 5);
-scene.add(pLight2);
+// Build edge list
+const edges = [];
+nodes.forEach(n => {
+  n.connections.forEach(cid => {
+    const t = nodes.find(x => x.id === cid);
+    if (t && !edges.find(e => (e.a === n && e.b === t) || (e.a === t && e.b === n))) {
+      edges.push({ a: n, b: t });
+    }
+  });
+});
 
-// Stars
-const starGeo = new THREE.BufferGeometry();
-const starPos = new Float32Array(2000 * 3);
-for (let i = 0; i < 2000; i++) {
-  const r = 40 + Math.random() * 80;
-  const t = Math.random() * Math.PI * 2;
-  const p = Math.acos(2 * Math.random() - 1);
-  starPos[i*3] = r * Math.sin(p) * Math.cos(t);
-  starPos[i*3+1] = r * Math.sin(p) * Math.sin(t);
-  starPos[i*3+2] = r * Math.cos(p);
+// Physics config (Obsidian-style force graph)
+const REPULSION = 8000;      // Nós se repelem
+const ATTRACTION = 0.005;    // Conexões puxam
+const DAMPING = 0.85;        // Atrito
+const CENTER_GRAVITY = 0.01; // Puxa pro centro
+const MIN_DIST = 80;
+const NODE_SPEED = 0.3;
+
+let draggedNode = null;
+let isPanning = false;
+let panStartX, panStartY, panCamStartX, panCamStartY;
+let mouseX = 0, mouseY = 0;
+let selectedNode = null;
+let hoveredNode = null;
+
+// Screen to world
+function screenToWorld(sx, sy) {
+  return {
+    x: (sx - W/2) / camZoom + camX,
+    y: (sy - H/2) / camZoom + camY
+  };
 }
-starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, sizeAttenuation: true })));
 
-// Atom group
-const atomGroup = new THREE.Group();
-scene.add(atomGroup);
+function worldToScreen(wx, wy) {
+  return {
+    x: (wx - camX) * camZoom + W/2,
+    y: (wy - camY) * camZoom + H/2
+  };
+}
 
-// --- NUCLEUS ---
-const nucleusGroup = new THREE.Group();
-atomGroup.add(nucleusGroup);
+function getNodeAt(sx, sy) {
+  const w = screenToWorld(sx, sy);
+  let closest = null, minDist = Infinity;
+  for (const n of nodes) {
+    const dx = w.x - n.x, dy = w.y - n.y;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    if (d < n.size/2 + 15 && d < minDist) {
+      closest = n;
+      minDist = d;
+    }
+  }
+  return closest;
+}
 
-const protonMat = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0xff2222, emissiveIntensity: 0.3, roughness: 0.4, metalness: 0.2 });
-const neutronMat = new THREE.MeshStandardMaterial({ color: 0x888899, emissive: 0x555566, emissiveIntensity: 0.2, roughness: 0.5, metalness: 0.1 });
-const sphereGeo = new THREE.SphereGeometry(0.42, 16, 16);
+// Physics step
+function physics() {
+  // Reset forces
+  nodes.forEach(n => { n.fx = 0; n.fy = 0; });
 
-// Place nucleons in clustered formation
-const nucleonPositions = [];
-const layers = [
-  { count: 4, r: 0, y: 0 },
-  { count: 8, r: 0.7, y: 0 },
-  { count: 6, r: 0.5, y: 0.55 },
-  { count: 6, r: 0.5, y: -0.55 },
-  { count: 4, r: 0.3, y: 1.0 },
-  { count: 4, r: 0.3, y: -1.0 }
-];
-let idx = 0;
-layers.forEach(layer => {
-  for (let i = 0; i < layer.count; i++) {
-    const angle = (i / layer.count) * Math.PI * 2 + Math.random() * 0.3;
-    const rr = layer.r * (0.7 + Math.random() * 0.6);
-    nucleonPositions.push(new THREE.Vector3(
-      Math.cos(angle) * rr,
-      layer.y + (Math.random() - 0.5) * 0.3,
-      Math.sin(angle) * rr
-    ));
-    idx++;
+  // Repulsion (Coulomb's law)
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j];
+      let dx = b.x - a.x, dy = b.y - a.y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 1) dist = 1;
+      
+      const force = REPULSION / (dist * dist);
+      const fx = (dx / dist) * force;
+      const fy = (dy / dist) * force;
+      
+      a.fx -= fx;
+      a.fy -= fy;
+      b.fx += fx;
+      b.fy += fy;
+    }
+  }
+
+  // Attraction (Hooke's law - springs)
+  edges.forEach(e => {
+    const dx = e.b.x - e.a.x;
+    const dy = e.b.y - e.a.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const force = (dist - 150) * ATTRACTION;
+    
+    const fx = (dx / dist) * force;
+    const fy = (dy / dist) * force;
+    
+    e.a.fx += fx;
+    e.a.fy += fy;
+    e.b.fx -= fx;
+    e.b.fy -= fy;
+  });
+
+  // Center gravity
+  nodes.forEach(n => {
+    n.fx -= n.x * CENTER_GRAVITY;
+    n.fy -= n.y * CENTER_GRAVITY;
+  });
+
+  // Apply forces
+  nodes.forEach(n => {
+    if (n === draggedNode) return;
+    
+    n.vx = (n.vx + n.fx * NODE_SPEED) * DAMPING;
+    n.vy = (n.vy + n.fy * NODE_SPEED) * DAMPING;
+    
+    // Clamp velocity
+    const speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
+    if (speed > 10) {
+      n.vx = (n.vx / speed) * 10;
+      n.vy = (n.vy / speed) * 10;
+    }
+    
+    n.x += n.vx;
+    n.y += n.vy;
+  });
+
+  // Smooth camera
+  camX += (camTargetX - camX) * 0.1;
+  camY += (camTargetY - camY) * 0.1;
+  camZoom += (camTargetZoom - camZoom) * 0.1;
+}
+
+// Draw
+function draw() {
+  ctx.fillStyle = '#1e1e1e';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.translate(W/2, H/2);
+  ctx.scale(camZoom, camZoom);
+  ctx.translate(-camX, -camY);
+
+  // Draw edges
+  edges.forEach(e => {
+    const highlighted = selectedNode && (e.a === selectedNode || e.b === selectedNode);
+    ctx.beginPath();
+    ctx.moveTo(e.a.x, e.a.y);
+    ctx.lineTo(e.b.x, e.b.y);
+    ctx.strokeStyle = highlighted ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = highlighted ? 1.5 / camZoom : 1 / camZoom;
+    ctx.stroke();
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const isHovered = hoveredNode === n;
+    const isSelected = selectedNode === n;
+    const isConnected = selectedNode && edges.some(e => 
+      (e.a === selectedNode && e.b === n) || (e.b === selectedNode && e.a === n)
+    );
+    const dimmed = selectedNode && !isSelected && !isConnected;
+    const r = n.size / 2;
+
+    // Glow
+    if (isHovered || isSelected) {
+      const glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r * 2);
+      glow.addColorStop(0, n.color + '50');
+      glow.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r * 2, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+    }
+
+    // Node body
+    const grad = ctx.createRadialGradient(n.x - r*0.3, n.y - r*0.3, 0, n.x, n.y, r);
+    grad.addColorStop(0, n.color);
+    grad.addColorStop(1, shadeColor(n.color, -40));
+    
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = dimmed ? grad + '30' : grad;
+    ctx.globalAlpha = dimmed ? 0.3 : 1;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Emoji
+    ctx.font = `${r * 0.9}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(n.emoji, n.x, n.y);
+
+    // Label
+    ctx.font = `bold ${Math.max(10, r * 0.45)}px Segoe UI, sans-serif`;
+    ctx.fillStyle = dimmed ? '#555' : '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillText(n.name, n.x, n.y + r + 14);
+  });
+
+  ctx.restore();
+}
+
+function shadeColor(color, percent) {
+  const num = parseInt(color.replace('#',''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.min(255, Math.max(0, (num >> 16) + amt));
+  const G = Math.min(255, Math.max(0, ((num >> 8) & 0xff) + amt));
+  const B = Math.min(255, Math.max(0, (num & 0xff) + amt));
+  return '#' + ((1<<24) + (R<<16) + (G<<8) + B).toString(16).slice(1);
+}
+
+// Mouse events
+canvas.addEventListener('mousedown', (e) => {
+  const node = getNodeAt(e.clientX, e.clientY);
+  
+  if (node) {
+    draggedNode = node;
+    draggedNode.pinned = true;
+    draggedNode.vx = 0;
+    draggedNode.vy = 0;
+    document.body.classList.add('node-dragging');
+  } else {
+    isPanning = true;
+    panStartX = e.clientX;
+    panStartY = e.clientY;
+    panCamStartX = camTargetX;
+    panCamStartY = camTargetY;
+    document.body.classList.add('dragging');
   }
 });
 
-nucleonPositions.forEach((pos, i) => {
-  const mat = i < 12 ? protonMat : neutronMat;
-  const mesh = new THREE.Mesh(sphereGeo, mat);
-  mesh.position.copy(pos);
-  nucleusGroup.add(mesh);
+canvas.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  if (draggedNode) {
+    const w = screenToWorld(e.clientX, e.clientY);
+    draggedNode.x = w.x;
+    draggedNode.y = w.y;
+    draggedNode.vx = 0;
+    draggedNode.vy = 0;
+  } else if (isPanning) {
+    const dx = (e.clientX - panStartX) / camZoom;
+    const dy = (e.clientY - panStartY) / camZoom;
+    camTargetX = panCamStartX - dx;
+    camTargetY = panCamStartY - dy;
+  }
+
+  // Hover
+  const node = getNodeAt(e.clientX, e.clientY);
+  hoveredNode = node;
+  canvas.style.cursor = node ? 'pointer' : (isPanning || draggedNode ? 'grabbing' : 'grab');
+
+  // Tooltip
+  const tooltip = document.getElementById('tooltip');
+  if (node && !isPanning && !draggedNode) {
+    tooltip.textContent = node.name;
+    tooltip.style.left = e.clientX + 15 + 'px';
+    tooltip.style.top = e.clientY + 15 + 'px';
+    tooltip.classList.add('visible');
+  } else {
+    tooltip.classList.remove('visible');
+  }
 });
 
-// Nucleus glow
-const glowGeo = new THREE.SphereGeometry(1.6, 32, 32);
-const glowMat = new THREE.MeshBasicMaterial({
-  color: 0xff4444, transparent: true, opacity: 0.08, side: THREE.BackSide
-});
-nucleusGroup.add(new THREE.Mesh(glowGeo, glowMat));
-const glowGeo2 = new THREE.SphereGeometry(2.2, 32, 32);
-const glowMat2 = new THREE.MeshBasicMaterial({
-  color: 0xff2244, transparent: true, opacity: 0.04, side: THREE.BackSide
-});
-nucleusGroup.add(new THREE.Mesh(glowGeo2, glowMat2));
-
-// --- ORBITAL PATHS & ELECTRONS ---
-const orbitalDefs = [
-  { rx: 8, rz: 5, tiltX: 0, tiltZ: 0, speed: 0.08, color: 0x00e5ff, startAngle: 0 },
-  { rx: 6, rz: 10, tiltX: 60, tiltZ: 0, speed: 0.06, color: 0x7c4dff, startAngle: 2.1 },
-  { rx: 9, rz: 4, tiltX: -60, tiltZ: 0, speed: 0.1, color: 0x00bcd4, startAngle: 4.2 },
-  { rx: 5, rz: 7, tiltX: 90, tiltZ: 0, speed: 0.07, color: 0x448aff, startAngle: 1.0 }
-];
-
-const electrons = [];
-const trails = [];
-
-orbitalDefs.forEach((def, i) => {
-  const orbitalGroup = new THREE.Group();
-  orbitalGroup.rotation.x = THREE.MathUtils.degToRad(def.tiltX);
-  orbitalGroup.rotation.z = THREE.MathUtils.degToRad(def.tiltZ);
-  atomGroup.add(orbitalGroup);
-
-  // Draw elliptical path
-  const curve = new THREE.EllipseCurve(0, 0, def.rx, def.rz, 0, 2 * Math.PI, false, 0);
-  const pts = curve.getPoints(128);
-  const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
-  const lineMat = new THREE.LineBasicMaterial({ color: def.color, transparent: true, opacity: 0.2 });
-  const line = new THREE.LineLoop(lineGeo, lineMat);
-  orbitalGroup.add(line);
-
-  // Glow ring
-  const ringGeo = new THREE.RingGeometry(def.rx - 0.08, def.rx + 0.08, 64);
-  // We'll skip ring geometry for simplicity and use the line
-
-  // Electron sphere
-  const eMat = new THREE.MeshBasicMaterial({ color: def.color });
-  const eGeo = new THREE.SphereGeometry(0.2, 12, 12);
-  const electron = new THREE.Mesh(eGeo, eMat);
-  orbitalGroup.add(electron);
-
-  // Electron glow
-  const eGlowMat = new THREE.MeshBasicMaterial({ color: def.color, transparent: true, opacity: 0.3 });
-  const eGlow = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 12), eGlowMat);
-  orbitalGroup.add(eGlow);
-
-  // Trail
-  const trailLen = 20;
-  const trailPositions = new Float32Array(trailLen * 3);
-  const trailGeo = new THREE.BufferGeometry();
-  trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
-  const trailMat = new THREE.LineBasicMaterial({ color: def.color, transparent: true, opacity: 0.4 });
-  const trail = new THREE.Line(trailGeo, trailMat);
-  orbitalGroup.add(trail);
-
-  // Small particles near electron
-  const partCount = 6;
-  const partGeo = new THREE.BufferGeometry();
-  const partPos = new Float32Array(partCount * 3);
-  partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
-  const partMat = new THREE.PointsMaterial({ color: def.color, size: 0.08, transparent: true, opacity: 0.6 });
-  const particles = new THREE.Points(partGeo, partMat);
-  orbitalGroup.add(particles);
-
-  electrons.push({ orbital: orbitalGroup, curve, electron, eGlow, def, angle: def.startAngle, trail, trailGeo, trailPositions, trailLen, particles, partGeo, partPos, partCount });
+canvas.addEventListener('mouseup', (e) => {
+  if (draggedNode) {
+    draggedNode.pinned = false;
+    draggedNode = null;
+    document.body.classList.remove('node-dragging');
+  }
+  if (isPanning) {
+    isPanning = false;
+    document.body.classList.remove('dragging');
+  }
 });
 
-// Nucleus ambient glow particles
-const nucleonPartCount = 30;
-const nucleonPartGeo = new THREE.BufferGeometry();
-const nucleonPartPos = new Float32Array(nucleonPartCount * 3);
-for (let i = 0; i < nucleonPartCount; i++) {
-  const a = Math.random() * Math.PI * 2;
-  const r = 1.0 + Math.random() * 0.8;
-  nucleonPartPos[i*3] = Math.cos(a) * r;
-  nucleonPartPos[i*3+1] = (Math.random()-0.5) * 1.6;
-  nucleonPartPos[i*3+2] = Math.sin(a) * r;
-}
-nucleonPartGeo.setAttribute('position', new THREE.BufferAttribute(nucleonPartPos, 3));
-const nucleonPartMat = new THREE.PointsMaterial({ color: 0xff6644, size: 0.12, transparent: true, opacity: 0.4 });
-nucleusGroup.add(new THREE.Points(nucleonPartGeo, nucleonPartMat));
-
-// --- PROJECT NODES ---
-const nodeGroup = new THREE.Group();
-atomGroup.add(nodeGroup);
-
-const nodeMeshes = [];
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-PROJECTS.forEach((p, i) => {
-  const angle = (i / PROJECTS.length) * Math.PI * 2;
-  const r = 14;
-  const y = (Math.random() - 0.5) * 3;
-  const x = Math.cos(angle) * r;
-  const z = Math.sin(angle) * r;
-
-  // Node sphere
-  const nGeo = new THREE.SphereGeometry(0.35, 16, 16);
-  const nMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
-  const node = new THREE.Mesh(nGeo, nMat);
-  node.position.set(x, y, z);
-  node.userData = { project: p };
-  nodeGroup.add(node);
-
-  // Node glow
-  const ngGeo = new THREE.SphereGeometry(0.6, 16, 16);
-  const ngMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.15 });
-  const nGlow = new THREE.Mesh(ngGeo, ngMat);
-  node.add(nGlow);
-
-  // Line to center
-  const lineGeo = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(x, y, z)
-  ]);
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.08 });
-  nodeGroup.add(new THREE.Line(lineGeo, lineMat));
-
-  // Canvas sprite for emoji
-  const canvas = document.createElement('canvas');
-  canvas.width = 128; canvas.height = 128;
-  const ctx = canvas.getContext('2d');
-  ctx.font = '64px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(p.emoji, 64, 64);
-  const tex = new THREE.CanvasTexture(canvas);
-  const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-  const sprite = new THREE.Sprite(spriteMat);
-  sprite.scale.set(1.2, 1.2, 1);
-  sprite.position.set(x, y + 0.8, z);
-  nodeGroup.add(sprite);
-
-  // Label
-  const lCanvas = document.createElement('canvas');
-  lCanvas.width = 256; lCanvas.height = 64;
-  const lCtx = lCanvas.getContext('2d');
-  lCtx.font = 'bold 22px Segoe UI, sans-serif';
-  lCtx.fillStyle = '#ffffff';
-  lCtx.textAlign = 'center';
-  lCtx.fillText(p.name, 128, 36);
-  const lTex = new THREE.CanvasTexture(lCanvas);
-  const lMat = new THREE.SpriteMaterial({ map: lTex, transparent: true });
-  const label = new THREE.Sprite(lMat);
-  label.scale.set(3, 0.75, 1);
-  label.position.set(x, y - 0.7, z);
-  nodeGroup.add(label);
-
-  nodeMeshes.push(node);
+canvas.addEventListener('dblclick', (e) => {
+  const node = getNodeAt(e.clientX, e.clientY);
+  if (node && node.url) openModal(node);
 });
 
-// --- MOUSE INTERACTION ---
-let isDragging = false;
-let prevMouse = { x: 0, y: 0 };
-let rotVel = { x: 0, y: 0 };
-const autoRotateSpeed = 0.00005;
+canvas.addEventListener('click', (e) => {
+  const node = getNodeAt(e.clientX, e.clientY);
+  selectedNode = node ? (selectedNode === node ? null : node) : null;
+});
 
-renderer.domElement.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  prevMouse = { x: e.clientX, y: e.clientY };
-});
-renderer.domElement.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  const dx = e.clientX - prevMouse.x;
-  const dy = e.clientY - prevMouse.y;
-  rotVel.x = dy * 0.005;
-  rotVel.y = dx * 0.005;
-  prevMouse = { x: e.clientX, y: e.clientY };
-});
-renderer.domElement.addEventListener('mouseup', () => isDragging = false);
-renderer.domElement.addEventListener('mouseleave', () => isDragging = false);
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  camTargetZoom = Math.max(0.2, Math.min(4, camTargetZoom * factor));
+}, { passive: false });
 
 // Touch
-renderer.domElement.addEventListener('touchstart', (e) => {
-  isDragging = true;
-  prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+let lastTouchDist = 0;
+canvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    const node = getNodeAt(t.clientX, t.clientY);
+    if (node) {
+      draggedNode = node;
+      draggedNode.pinned = true;
+    } else {
+      isPanning = true;
+      panStartX = t.clientX;
+      panStartY = t.clientY;
+      panCamStartX = camTargetX;
+      panCamStartY = camTargetY;
+    }
+  } else if (e.touches.length === 2) {
+    lastTouchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+  }
 }, { passive: true });
-renderer.domElement.addEventListener('touchmove', (e) => {
-  if (!isDragging) return;
-  const dx = e.touches[0].clientX - prevMouse.x;
-  const dy = e.touches[0].clientY - prevMouse.y;
-  rotVel.x = dy * 0.005;
-  rotVel.y = dx * 0.005;
-  prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    if (draggedNode) {
+      const w = screenToWorld(t.clientX, t.clientY);
+      draggedNode.x = w.x;
+      draggedNode.y = w.y;
+    } else if (isPanning) {
+      const dx = (t.clientX - panStartX) / camZoom;
+      const dy = (t.clientY - panStartY) / camZoom;
+      camTargetX = panCamStartX - dx;
+      camTargetY = panCamStartY - dy;
+    }
+  } else if (e.touches.length === 2) {
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    camTargetZoom = Math.max(0.2, Math.min(4, camTargetZoom * (dist / lastTouchDist)));
+    lastTouchDist = dist;
+  }
 }, { passive: true });
-renderer.domElement.addEventListener('touchend', () => isDragging = false);
 
-// Click on nodes - only if not dragged
-let mouseDownPos = { x: 0, y: 0 };
-let mouseDownTime = 0;
-renderer.domElement.addEventListener('mousedown', (e) => {
-  mouseDownPos = { x: e.clientX, y: e.clientY };
-  mouseDownTime = Date.now();
-});
-renderer.domElement.addEventListener('click', (e) => {
-  const dx = e.clientX - mouseDownPos.x;
-  const dy = e.clientY - mouseDownPos.y;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-  const elapsed = Date.now() - mouseDownTime;
-  if (dist > 5 || elapsed > 400) return;
-
-  mouse.x = (e.clientX / innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(nodeMeshes, false);
-  if (hits.length > 0) {
-    const proj = hits[0].object.userData.project;
-    if (proj) {
-      openModal(proj);
-      spawnAtomEffect(hits[0].object.position.clone());
-    }
-  }
+canvas.addEventListener('touchend', () => {
+  if (draggedNode) { draggedNode.pinned = false; draggedNode = null; }
+  isPanning = false;
 });
 
-// Mini atom formation effect on click
-let atomEffects = [];
-function spawnAtomEffect(origin) {
-  const count = 60;
-  const positions = new Float32Array(count * 3);
-  const velocities = [];
-  for (let i = 0; i < count; i++) {
-    positions[i*3] = origin.x;
-    positions[i*3+1] = origin.y;
-    positions[i*3+2] = origin.z;
-    velocities.push({
-      x: (Math.random()-0.5)*0.15,
-      y: (Math.random()-0.5)*0.15,
-      z: (Math.random()-0.5)*0.15,
-      targetR: 0.5 + Math.random()*1.5,
-      angle: Math.random()*Math.PI*2,
-      speed: 0.02+Math.random()*0.03,
-      orbitTilt: Math.random()*Math.PI
-    });
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const mat = new THREE.PointsMaterial({ color: 0x00e5ff, size: 0.15, transparent: true, opacity: 1 });
-  const points = new THREE.Points(geo, mat);
-  atomGroup.add(points);
-  const effect = { points, positions, velocities, life: 1, origin: origin.clone() };
-  atomEffects.push(effect);
-}
-
-// Resize
-window.addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
+// Search
+document.getElementById('search').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  nodes.forEach(n => {
+    n._match = !q || n.name.toLowerCase().includes(q) || n.desc.toLowerCase().includes(q);
+  });
 });
 
-// --- ANIMATE ---
-const clock = new THREE.Clock();
-
-function animate() {
-  requestAnimationFrame(animate);
-  const t = clock.getElapsedTime();
-
-  // Auto rotate
-  if (!isDragging) {
-    rotVel.y += autoRotateSpeed;
-    rotVel.x *= 0.95;
-  }
-  rotVel.y *= 0.98;
-  rotVel.x *= 0.98;
-
-  atomGroup.rotation.x += rotVel.x;
-  atomGroup.rotation.y += rotVel.y;
-
-  // Nucleus wobble
-  nucleusGroup.rotation.x = Math.sin(t * 0.8) * 0.03;
-  nucleusGroup.rotation.z = Math.cos(t * 0.6) * 0.025;
-  nucleusGroup.position.y = Math.sin(t * 0.5) * 0.03;
-
-  // Electrons
-  electrons.forEach((e) => {
-    e.angle += e.def.speed * 0.004;
-    const pos = e.curve.getPointAt(((e.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2));
-    e.electron.position.set(pos.x, 0, pos.y);
-    e.eGlow.position.copy(e.electron.position);
-
-    // Trail
-    e.trailPositions.copyWithin(3);
-    e.trailPositions[e.trailLen * 3 - 3] = pos.x;
-    e.trailPositions[e.trailLen * 3 - 2] = 0;
-    e.trailPositions[e.trailLen * 3 - 1] = pos.y;
-    e.trailGeo.attributes.position.needsUpdate = true;
-
-    // Particles around electron
-    for (let j = 0; j < e.partCount; j++) {
-      const pa = Math.random() * Math.PI * 2;
-      const pr = 0.2 + Math.random() * 0.3;
-      e.partPos[j*3] = pos.x + Math.cos(pa) * pr;
-      e.partPos[j*3+1] = (Math.random()-0.5) * 0.4;
-      e.partPos[j*3+2] = pos.y + Math.sin(pa) * pr;
-    }
-    e.partGeo.attributes.position.needsUpdate = true;
-  });
-
-  // Node pulse
-  nodeMeshes.forEach((n, i) => {
-    const s = 1 + Math.sin(t * 2 + i) * 0.1;
-    n.children[0].scale.set(s, s, s);
-  });
-
-  // Atom formation effects
-  atomEffects.forEach((eff, idx) => {
-    eff.life -= 0.008;
-    if (eff.life <= 0) {
-      atomGroup.remove(eff.points);
-      eff.points.geometry.dispose();
-      eff.points.material.dispose();
-      atomEffects.splice(idx, 1);
-      return;
-    }
-    eff.points.material.opacity = eff.life;
-    const pos = eff.positions;
-    for (let i = 0; i < eff.velocities.length; i++) {
-      const v = eff.velocities[i];
-      v.angle += v.speed;
-      const r = v.targetR * (1 - eff.life * 0.3);
-      pos[i*3] = eff.origin.x + Math.cos(v.angle) * r * Math.cos(v.orbitTilt);
-      pos[i*3+1] = eff.origin.y + Math.sin(v.angle) * r * 0.5;
-      pos[i*3+2] = eff.origin.z + Math.cos(v.angle) * r * Math.sin(v.orbitTilt);
-    }
-    eff.points.geometry.attributes.position.needsUpdate = true;
-  });
-
-  renderer.render(scene, camera);
+// Main loop
+function loop() {
+  physics();
+  draw();
+  requestAnimationFrame(loop);
 }
-animate();
-
-// --- SKELETON WALKER ---
-const skel = document.getElementById('skeleton-walker');
-let skelX = -150;
-let skelDir = 1;
-const skelSpeed = 1.5;
-function animateSkeleton() {
-  skelX += skelSpeed * skelDir;
-  const maxRight = window.innerWidth + 150;
-  if (skelX > maxRight) { skelDir = -1; skel.style.transform = 'scaleX(-1)'; }
-  if (skelX < -150) { skelDir = 1; skel.style.transform = 'scaleX(1)'; }
-  skel.style.left = skelX + 'px';
-  requestAnimationFrame(animateSkeleton);
-}
-animateSkeleton();
+loop();
 </script>
 </body>
 </html>
