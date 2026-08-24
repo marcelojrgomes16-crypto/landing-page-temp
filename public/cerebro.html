@@ -6,32 +6,18 @@
 <title>Cérebro Digital</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { 
-  overflow: hidden; 
-  background: #1a1b26; 
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  cursor: grab;
-}
+body { overflow: hidden; background: #1a1b26; font-family: 'Segoe UI', system-ui, sans-serif; cursor: grab; }
 body.dragging { cursor: grabbing; }
 body.node-dragging { cursor: grabbing; }
-canvas { display: block; }
-
+canvas { display: block; position: fixed; top: 0; left: 0; }
 #status-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
   display: flex; justify-content: center; gap: 30px; padding: 10px 20px;
   background: rgba(26,27,38,0.95); backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; color: #565f89;
 }
-.status-dot { 
-  width: 5px; height: 5px; border-radius: 50%; background: #9ece6a; 
-  display: inline-block; margin-right: 6px; 
-}
-
-#instructions {
-  position: fixed; bottom: 45px; left: 0; right: 0; text-align: center;
-  font-size: 0.7rem; color: rgba(255,255,255,0.2); z-index: 10; pointer-events: none;
-}
-
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: #9ece6a; display: inline-block; margin-right: 6px; }
+#instructions { position: fixed; bottom: 45px; left: 0; right: 0; text-align: center; font-size: 0.7rem; color: rgba(255,255,255,0.2); z-index: 10; pointer-events: none; }
 #modal-overlay {
   display: none; position: fixed; inset: 0; z-index: 100;
   background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
@@ -39,56 +25,25 @@ canvas { display: block; }
 }
 #modal-overlay.active { display: flex; }
 #modal {
-  background: #24283b;
-  border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  background: #24283b; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
   padding: 28px; max-width: 400px; width: 90%; text-align: center;
-  box-shadow: 0 0 60px rgba(0,0,0,0.5); animation: modal-in 0.2s ease;
+  box-shadow: 0 0 60px rgba(0,0,0,0.5); position: relative;
 }
-@keyframes modal-in { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
 #modal h2 { color: #c0caf5; font-size: 1.3rem; margin-bottom: 6px; }
 #modal .modal-emoji { font-size: 2.5rem; margin-bottom: 10px; }
 #modal p { color: #565f89; font-size: 0.85rem; margin-bottom: 18px; line-height: 1.5; }
-#modal a {
-  display: inline-block; padding: 9px 24px; background: #7aa2f7;
-  color: #1a1b26; text-decoration: none; border-radius: 6px; font-weight: 600;
-  transition: all 0.2s;
-}
+#modal a { display: inline-block; padding: 9px 24px; background: #7aa2f7; color: #1a1b26; text-decoration: none; border-radius: 6px; font-weight: 600; }
 #modal a:hover { background: #89b4fa; }
-#modal-close {
-  position: absolute; top: 10px; right: 14px; background: none; border: none;
-  color: #565f89; font-size: 1.4rem; cursor: pointer;
-}
+#modal-close { position: absolute; top: 10px; right: 14px; background: none; border: none; color: #565f89; font-size: 1.4rem; cursor: pointer; }
 .modal-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-#modal-close-btn {
-  padding: 9px 24px; background: transparent; border: 1px solid rgba(255,255,255,0.1);
-  color: #565f89; border-radius: 6px; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; font-size: 0.85rem;
-}
+#modal-close-btn { padding: 9px 24px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #565f89; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 #modal-close-btn:hover { border-color: #f7768e; color: #f7768e; }
-#modal-vscode {
-  padding: 9px 24px; background: #3b4261; border: none;
-  color: #c0caf5; border-radius: 6px; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; font-size: 0.85rem;
-}
+#modal-vscode { padding: 9px 24px; background: #3b4261; border: none; color: #c0caf5; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 #modal-vscode:hover { background: #444b6a; }
-#modal-cmd {
-  padding: 9px 24px; background: transparent; border: 1px solid rgba(122,162,247,0.3);
-  color: #7aa2f7; border-radius: 6px; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; font-size: 0.85rem;
-}
+#modal-cmd { padding: 9px 24px; background: transparent; border: 1px solid rgba(122,162,247,0.3); color: #7aa2f7; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
 #modal-cmd:hover { border-color: #7aa2f7; background: rgba(122,162,247,0.1); }
-#modal-cmd-msg { 
-  color: #7aa2f7; font-size: 0.75rem; margin-top: 10px; word-break: break-all;
-  background: rgba(122,162,247,0.08); padding: 8px 12px; border-radius: 6px;
-  border: 1px solid rgba(122,162,247,0.15); display: none;
-}
-
-#tooltip {
-  position: fixed; background: #414868; color: #c0caf5; padding: 6px 10px;
-  border-radius: 6px; font-size: 0.8rem; pointer-events: none;
-  opacity: 0; transition: opacity 0.15s; z-index: 200;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
+#modal-cmd-msg { color: #7aa2f7; font-size: 0.75rem; margin-top: 10px; word-break: break-all; background: rgba(122,162,247,0.08); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(122,162,247,0.15); display: none; }
+#tooltip { position: fixed; background: #414868; color: #c0caf5; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 #tooltip.visible { opacity: 1; }
 </style>
 </head>
@@ -98,9 +53,7 @@ canvas { display: block; }
   <span><span class="status-dot"></span>Sistema Online</span>
   <span>9 Projetos</span>
 </div>
-
 <div id="instructions">Arraste para mover &bull; Scroll para zoom &bull; Clique nos nós</div>
-
 <div id="tooltip"></div>
 
 <div id="modal-overlay">
@@ -119,328 +72,308 @@ canvas { display: block; }
   </div>
 </div>
 
+<canvas id="graph"></canvas>
+
 <script>
-const PROJECTS = [
-  { id:'cerebro', emoji:'🧠', name:'Cérebro Digital', desc:'Centro de comando.', color:'#bb9af7', size:8, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
-  { id:'v8', emoji:'🏋️', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#f7768e', size:6, connections:['cerebro','deploy'] },
-  { id:'financeiro', emoji:'💰', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#e0af68', size:5, connections:['cerebro','deploy'] },
-  { id:'estoque', emoji:'📦', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#9ece6a', size:5, connections:['cerebro','api','adega'] },
-  { id:'api', emoji:'⚡', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#ff9e64', size:4, connections:['cerebro','estoque'] },
-  { id:'deploy', emoji:'🚀', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#73daca', size:4, connections:['cerebro','v8','financeiro'] },
-  { id:'myrella', emoji:'💕', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#f7768e', size:4, connections:['cerebro','landing'] },
-  { id:'adega', emoji:'🍷', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#bb9af7', size:5, connections:['cerebro','estoque'] },
-  { id:'money', emoji:'💸', name:'MoneyPrinter', desc:'Vídeos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#7aa2f7', size:4, connections:['cerebro'] },
-  { id:'landing', emoji:'🌐', name:'Landing', desc:'Página temporária.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#565f89', size:3, connections:['cerebro','myrella'] }
-];
+(function() {
+  var PROJECTS = [
+    { id:'cerebro', emoji:'🧠', name:'Cérebro Digital', desc:'Centro de comando.', color:'#bb9af7', size:8, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
+    { id:'v8', emoji:'🏋️', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#f7768e', size:6, connections:['cerebro','deploy'] },
+    { id:'financeiro', emoji:'💰', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#e0af68', size:5, connections:['cerebro','deploy'] },
+    { id:'estoque', emoji:'📦', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#9ece6a', size:5, connections:['cerebro','api','adega'] },
+    { id:'api', emoji:'⚡', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#ff9e64', size:4, connections:['cerebro','estoque'] },
+    { id:'deploy', emoji:'🚀', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#73daca', size:4, connections:['cerebro','v8','financeiro'] },
+    { id:'myrella', emoji:'💕', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#f7768e', size:4, connections:['cerebro','landing'] },
+    { id:'adega', emoji:'🍷', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#bb9af7', size:5, connections:['cerebro','estoque'] },
+    { id:'money', emoji:'💸', name:'MoneyPrinter', desc:'Vídeos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#7aa2f7', size:4, connections:['cerebro'] },
+    { id:'landing', emoji:'🌐', name:'Landing', desc:'Página temporária.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#565f89', size:3, connections:['cerebro','myrella'] }
+  ];
 
-// Modal
-const overlay = document.getElementById('modal-overlay');
-document.getElementById('modal-close').onclick = () => overlay.classList.remove('active');
-document.getElementById('modal-close-btn').onclick = () => overlay.classList.remove('active');
-overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('active'); };
+  // Modal
+  var overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-close').onclick = function() { overlay.classList.remove('active'); };
+  document.getElementById('modal-close-btn').onclick = function() { overlay.classList.remove('active'); };
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.classList.remove('active'); };
 
-function openModal(p) {
-  document.getElementById('modal-emoji').textContent = p.emoji;
-  document.getElementById('modal-title').textContent = p.name;
-  document.getElementById('modal-desc').textContent = p.desc;
-  document.getElementById('modal-link').href = p.url || '#';
-  document.getElementById('modal-cmd-msg').style.display = 'none';
-  document.getElementById('modal-vscode').onclick = () => {
-    navigator.clipboard.writeText(`code "${p.dir}"`).then(() => {
-      const msg = document.getElementById('modal-cmd-msg');
-      msg.style.display = 'block';
-      msg.innerHTML = 'Copiado: <code>code "' + p.dir + '"</code>';
-    });
-  };
-  document.getElementById('modal-cmd').onclick = () => {
-    navigator.clipboard.writeText(`cd /d "${p.dir}" && code "${p.file}"`).then(() => {
-      const msg = document.getElementById('modal-cmd-msg');
-      msg.style.display = 'block';
-      msg.innerHTML = 'Copiado!';
-    });
-  };
-  overlay.classList.add('active');
-}
-
-// Camera
-let camX = 0, camY = 0, camZoom = 1;
-let camTargetX = 0, camTargetY = 0, camTargetZoom = 1;
-
-// Nodes
-const nodes = PROJECTS.map((p, i) => ({
-  ...p,
-  x: (Math.random() - 0.5) * 400,
-  y: (Math.random() - 0.5) * 300,
-  vx: 0, vy: 0,
-  fx: 0, fy: 0,
-  pinned: false
-}));
-
-// Edges
-const edges = [];
-nodes.forEach(n => {
-  n.connections.forEach(cid => {
-    const t = nodes.find(x => x.id === cid);
-    if (t && !edges.find(e => (e.a === n && e.b === t) || (e.a === t && e.b === n))) {
-      edges.push({ a: n, b: t });
-    }
-  });
-});
-
-// Canvas
-const canvas = document.createElement('canvas');
-document.body.appendChild(canvas);
-const ctx = canvas.getContext('2d');
-let W, H;
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; draw(); }
-resize();
-addEventListener('resize', resize);
-
-// Physics
-const REPULSION = 3000;
-const ATTRACTION = 0.008;
-const DAMPING = 0.82;
-const CENTER_GRAVITY = 0.015;
-const NODE_SPEED = 0.25;
-
-let draggedNode = null;
-let isPanning = false;
-let panStartX, panStartY, panCamStartX, panCamStartY;
-let selectedNode = null;
-let hoveredNode = null;
-
-function screenToWorld(sx, sy) {
-  return {
-    x: (sx - W/2) / camZoom + camX,
-    y: (sy - H/2) / camZoom + camY
-  };
-}
-
-function getNodeAt(sx, sy) {
-  const w = screenToWorld(sx, sy);
-  let closest = null, minDist = Infinity;
-  for (const n of nodes) {
-    const dx = w.x - n.x, dy = w.y - n.y;
-    const d = Math.sqrt(dx*dx + dy*dy);
-    if (d < n.size + 10 && d < minDist) {
-      closest = n;
-      minDist = d;
-    }
-  }
-  return closest;
-}
-
-function physics() {
-  nodes.forEach(n => { n.fx = 0; n.fy = 0; });
-
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-      const a = nodes[i], b = nodes[j];
-      let dx = b.x - a.x, dy = b.y - a.y;
-      let dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 1) dist = 1;
-      const force = REPULSION / (dist * dist);
-      const fx = (dx / dist) * force;
-      const fy = (dy / dist) * force;
-      a.fx -= fx; a.fy -= fy;
-      b.fx += fx; b.fy += fy;
-    }
+  function openModal(p) {
+    document.getElementById('modal-emoji').textContent = p.emoji;
+    document.getElementById('modal-title').textContent = p.name;
+    document.getElementById('modal-desc').textContent = p.desc;
+    document.getElementById('modal-link').href = p.url || '#';
+    document.getElementById('modal-cmd-msg').style.display = 'none';
+    document.getElementById('modal-vscode').onclick = function() {
+      navigator.clipboard.writeText('code "' + p.dir + '"').then(function() {
+        var msg = document.getElementById('modal-cmd-msg');
+        msg.style.display = 'block';
+        msg.innerHTML = 'Copiado: <code>code "' + p.dir + '"</code>';
+      });
+    };
+    document.getElementById('modal-cmd').onclick = function() {
+      navigator.clipboard.writeText('cd /d "' + p.dir + '" && code "' + p.file + '"').then(function() {
+        var msg = document.getElementById('modal-cmd-msg');
+        msg.style.display = 'block';
+        msg.innerHTML = 'Copiado!';
+      });
+    };
+    overlay.classList.add('active');
   }
 
-  edges.forEach(e => {
-    const dx = e.b.x - e.a.x;
-    const dy = e.b.y - e.a.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    const force = (dist - 100) * ATTRACTION;
-    const fx = (dx / dist) * force;
-    const fy = (dy / dist) * force;
-    e.a.fx += fx; e.a.fy += fy;
-    e.b.fx -= fx; e.b.fy -= fy;
-  });
+  // Canvas
+  var canvas = document.getElementById('graph');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width = window.innerWidth;
+  var H = canvas.height = window.innerHeight;
 
-  nodes.forEach(n => {
-    n.fx -= n.x * CENTER_GRAVITY;
-    n.fy -= n.y * CENTER_GRAVITY;
-  });
-
-  nodes.forEach(n => {
-    if (n === draggedNode) return;
-    n.vx = (n.vx + n.fx * NODE_SPEED) * DAMPING;
-    n.vy = (n.vy + n.fy * NODE_SPEED) * DAMPING;
-    const speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
-    if (speed > 8) { n.vx = (n.vx/speed)*8; n.vy = (n.vy/speed)*8; }
-    n.x += n.vx;
-    n.y += n.vy;
-  });
-
-  camX += (camTargetX - camX) * 0.1;
-  camY += (camTargetY - camY) * 0.1;
-  camZoom += (camTargetZoom - camZoom) * 0.1;
-}
-
-function draw() {
-  ctx.fillStyle = '#1a1b26';
-  ctx.fillRect(0, 0, W, H);
-
-  ctx.save();
-  ctx.translate(W/2, H/2);
-  ctx.scale(camZoom, camZoom);
-  ctx.translate(-camX, -camY);
-
-  // Edges
-  edges.forEach(e => {
-    const highlighted = selectedNode && (e.a === selectedNode || e.b === selectedNode);
-    ctx.beginPath();
-    ctx.moveTo(e.a.x, e.a.y);
-    ctx.lineTo(e.b.x, e.b.y);
-    ctx.strokeStyle = highlighted ? 'rgba(187,154,247,0.25)' : 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = highlighted ? 1 / camZoom : 0.5 / camZoom;
-    ctx.stroke();
-  });
+  // Camera
+  var camX = 0, camY = 0, camZoom = 1;
+  var camTargetX = 0, camTargetY = 0, camTargetZoom = 1;
 
   // Nodes
-  nodes.forEach(n => {
-    const isHovered = hoveredNode === n;
-    const isSelected = selectedNode === n;
-    const isConnected = selectedNode && edges.some(e => 
-      (e.a === selectedNode && e.b === n) || (e.b === selectedNode && e.a === n)
-    );
-    const dimmed = selectedNode && !isSelected && !isConnected;
-    const r = n.size;
-
-    // Glow on hover/select
-    if (isHovered || isSelected) {
-      const glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r * 3);
-      glow.addColorStop(0, n.color + '40');
-      glow.addColorStop(1, 'transparent');
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
-      ctx.fillStyle = glow;
-      ctx.fill();
-    }
-
-    // Dot
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = dimmed ? n.color + '30' : n.color;
-    ctx.globalAlpha = dimmed ? 0.3 : 1;
-    ctx.fill();
-    ctx.globalAlpha = 1;
+  var nodes = PROJECTS.map(function(p) {
+    return {
+      id: p.id, emoji: p.emoji, name: p.name, desc: p.desc, url: p.url,
+      dir: p.dir, file: p.file, color: p.color, size: p.size, connections: p.connections,
+      x: (Math.random() - 0.5) * 400,
+      y: (Math.random() - 0.5) * 300,
+      vx: 0, vy: 0, fx: 0, fy: 0, pinned: false
+    };
   });
 
-  ctx.restore();
-}
+  // Edges
+  var edges = [];
+  nodes.forEach(function(n) {
+    n.connections.forEach(function(cid) {
+      var t = nodes.find(function(x) { return x.id === cid; });
+      if (t && !edges.find(function(e) { return (e.a === n && e.b === t) || (e.a === t && e.b === n); })) {
+        edges.push({ a: n, b: t });
+      }
+    });
+  });
 
-// Mouse
-canvas.addEventListener('mousedown', (e) => {
-  const node = getNodeAt(e.clientX, e.clientY);
-  if (node) {
-    draggedNode = node;
-    draggedNode.pinned = true;
-    draggedNode.vx = 0; draggedNode.vy = 0;
-    document.body.classList.add('node-dragging');
-  } else {
-    isPanning = true;
-    panStartX = e.clientX; panStartY = e.clientY;
-    panCamStartX = camTargetX; panCamStartY = camTargetY;
-    document.body.classList.add('dragging');
-  }
-});
+  // Physics
+  var REPULSION = 3000, ATTRACTION = 0.008, DAMPING = 0.82, CENTER_GRAVITY = 0.015, NODE_SPEED = 0.25;
+  var draggedNode = null, isPanning = false;
+  var panStartX, panStartY, panCamStartX, panCamStartY;
+  var selectedNode = null, hoveredNode = null;
 
-canvas.addEventListener('mousemove', (e) => {
-  if (draggedNode) {
-    const w = screenToWorld(e.clientX, e.clientY);
-    draggedNode.x = w.x; draggedNode.y = w.y;
-    draggedNode.vx = 0; draggedNode.vy = 0;
-  } else if (isPanning) {
-    camTargetX = panCamStartX - (e.clientX - panStartX) / camZoom;
-    camTargetY = panCamStartY - (e.clientY - panStartY) / camZoom;
+  function screenToWorld(sx, sy) {
+    return { x: (sx - W/2) / camZoom + camX, y: (sy - H/2) / camZoom + camY };
   }
 
-  const node = getNodeAt(e.clientX, e.clientY);
-  hoveredNode = node;
-  canvas.style.cursor = node ? 'pointer' : (isPanning || draggedNode ? 'grabbing' : 'grab');
-
-  const tooltip = document.getElementById('tooltip');
-  if (node && !isPanning && !draggedNode) {
-    tooltip.textContent = node.name;
-    tooltip.style.left = e.clientX + 12 + 'px';
-    tooltip.style.top = e.clientY + 12 + 'px';
-    tooltip.classList.add('visible');
-  } else {
-    tooltip.classList.remove('visible');
+  function getNodeAt(sx, sy) {
+    var w = screenToWorld(sx, sy);
+    var closest = null, minDist = Infinity;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var dx = w.x - n.x, dy = w.y - n.y;
+      var d = Math.sqrt(dx*dx + dy*dy);
+      if (d < n.size + 10 && d < minDist) { closest = n; minDist = d; }
+    }
+    return closest;
   }
-  draw();
-});
 
-canvas.addEventListener('mouseup', () => {
-  if (draggedNode) { draggedNode.pinned = false; draggedNode = null; document.body.classList.remove('node-dragging'); }
-  if (isPanning) { isPanning = false; document.body.classList.remove('dragging'); }
-});
-
-canvas.addEventListener('dblclick', (e) => {
-  const node = getNodeAt(e.clientX, e.clientY);
-  if (node && node.url) openModal(node);
-});
-
-canvas.addEventListener('click', (e) => {
-  const node = getNodeAt(e.clientX, e.clientY);
-  selectedNode = node ? (selectedNode === node ? null : node) : null;
-  draw();
-});
-
-canvas.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  camTargetZoom = Math.max(0.3, Math.min(5, camTargetZoom * (e.deltaY > 0 ? 0.9 : 1.1)));
-  draw();
-}, { passive: false });
-
-// Touch
-let lastTouchDist = 0;
-canvas.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
-    const t = e.touches[0];
-    const node = getNodeAt(t.clientX, t.clientY);
-    if (node) { draggedNode = node; draggedNode.pinned = true; }
-    else { isPanning = true; panStartX = t.clientX; panStartY = t.clientY; panCamStartX = camTargetX; panCamStartY = camTargetY; }
-  } else if (e.touches.length === 2) {
-    lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  function physics() {
+    var i, j, a, b, dx, dy, dist, force, fx, fy;
+    for (i = 0; i < nodes.length; i++) { nodes[i].fx = 0; nodes[i].fy = 0; }
+    for (i = 0; i < nodes.length; i++) {
+      for (j = i + 1; j < nodes.length; j++) {
+        a = nodes[i]; b = nodes[j];
+        dx = b.x - a.x; dy = b.y - a.y;
+        dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 1) dist = 1;
+        force = REPULSION / (dist * dist);
+        fx = (dx / dist) * force; fy = (dy / dist) * force;
+        a.fx -= fx; a.fy -= fy; b.fx += fx; b.fy += fy;
+      }
+    }
+    edges.forEach(function(e) {
+      dx = e.b.x - e.a.x; dy = e.b.y - e.a.y;
+      dist = Math.sqrt(dx*dx + dy*dy);
+      force = (dist - 100) * ATTRACTION;
+      fx = (dx / dist) * force; fy = (dy / dist) * force;
+      e.a.fx += fx; e.a.fy += fy; e.b.fx -= fx; e.b.fy -= fy;
+    });
+    nodes.forEach(function(n) { n.fx -= n.x * CENTER_GRAVITY; n.fy -= n.y * CENTER_GRAVITY; });
+    nodes.forEach(function(n) {
+      if (n === draggedNode) return;
+      n.vx = (n.vx + n.fx * NODE_SPEED) * DAMPING;
+      n.vy = (n.vy + n.fy * NODE_SPEED) * DAMPING;
+      var speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
+      if (speed > 8) { n.vx = (n.vx/speed)*8; n.vy = (n.vy/speed)*8; }
+      n.x += n.vx; n.y += n.vy;
+    });
+    camX += (camTargetX - camX) * 0.1;
+    camY += (camTargetY - camY) * 0.1;
+    camZoom += (camTargetZoom - camZoom) * 0.1;
   }
-}, { passive: true });
 
-canvas.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 1) {
-    const t = e.touches[0];
-    if (draggedNode) { const w = screenToWorld(t.clientX, t.clientY); draggedNode.x = w.x; draggedNode.y = w.y; }
-    else if (isPanning) { camTargetX = panCamStartX - (t.clientX - panStartX) / camZoom; camTargetY = panCamStartY - (t.clientY - panStartY) / camZoom; }
-  } else if (e.touches.length === 2) {
-    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    camTargetZoom = Math.max(0.3, Math.min(5, camTargetZoom * (dist / lastTouchDist)));
-    lastTouchDist = dist;
+  function draw() {
+    ctx.fillStyle = '#1a1b26';
+    ctx.fillRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    ctx.scale(camZoom, camZoom);
+    ctx.translate(-camX, -camY);
+
+    edges.forEach(function(e) {
+      var highlighted = selectedNode && (e.a === selectedNode || e.b === selectedNode);
+      ctx.beginPath();
+      ctx.moveTo(e.a.x, e.a.y);
+      ctx.lineTo(e.b.x, e.b.y);
+      ctx.strokeStyle = highlighted ? 'rgba(187,154,247,0.25)' : 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = highlighted ? 1 / camZoom : 0.5 / camZoom;
+      ctx.stroke();
+    });
+
+    nodes.forEach(function(n) {
+      var isHovered = hoveredNode === n;
+      var isSelected = selectedNode === n;
+      var isConnected = selectedNode && edges.some(function(e) {
+        return (e.a === selectedNode && e.b === n) || (e.b === selectedNode && e.a === n);
+      });
+      var dimmed = selectedNode && !isSelected && !isConnected;
+      var r = n.size;
+
+      if (isHovered || isSelected) {
+        var glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r * 3);
+        glow.addColorStop(0, n.color + '40');
+        glow.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = dimmed ? n.color + '30' : n.color;
+      ctx.globalAlpha = dimmed ? 0.3 : 1;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    ctx.restore();
   }
-  draw();
-}, { passive: true });
 
-canvas.addEventListener('touchend', () => {
-  if (draggedNode) { draggedNode.pinned = false; draggedNode = null; }
-  isPanning = false;
-});
+  function redraw() { draw(); }
 
-// Settle then stop
-let settled = false;
-let settleFrames = 0;
-const SETTLE_FRAMES = 200;
+  // Mouse
+  canvas.addEventListener('mousedown', function(e) {
+    var node = getNodeAt(e.clientX, e.clientY);
+    if (node) {
+      draggedNode = node; draggedNode.pinned = true;
+      draggedNode.vx = 0; draggedNode.vy = 0;
+      document.body.classList.add('node-dragging');
+    } else {
+      isPanning = true;
+      panStartX = e.clientX; panStartY = e.clientY;
+      panCamStartX = camTargetX; panCamStartY = camTargetY;
+      document.body.classList.add('dragging');
+    }
+  });
 
-function loop() {
-  if (!settled) {
-    physics();
+  canvas.addEventListener('mousemove', function(e) {
+    if (draggedNode) {
+      var w = screenToWorld(e.clientX, e.clientY);
+      draggedNode.x = w.x; draggedNode.y = w.y;
+      draggedNode.vx = 0; draggedNode.vy = 0;
+    } else if (isPanning) {
+      camTargetX = panCamStartX - (e.clientX - panStartX) / camZoom;
+      camTargetY = panCamStartY - (e.clientY - panStartY) / camZoom;
+    }
+    var node = getNodeAt(e.clientX, e.clientY);
+    hoveredNode = node;
+    canvas.style.cursor = node ? 'pointer' : (isPanning || draggedNode ? 'grabbing' : 'grab');
+    var tooltip = document.getElementById('tooltip');
+    if (node && !isPanning && !draggedNode) {
+      tooltip.textContent = node.name;
+      tooltip.style.left = (e.clientX + 12) + 'px';
+      tooltip.style.top = (e.clientY + 12) + 'px';
+      tooltip.classList.add('visible');
+    } else {
+      tooltip.classList.remove('visible');
+    }
+    redraw();
+  });
+
+  canvas.addEventListener('mouseup', function() {
+    if (draggedNode) { draggedNode.pinned = false; draggedNode = null; document.body.classList.remove('node-dragging'); }
+    if (isPanning) { isPanning = false; document.body.classList.remove('dragging'); }
+  });
+
+  canvas.addEventListener('dblclick', function(e) {
+    var node = getNodeAt(e.clientX, e.clientY);
+    if (node && node.url) openModal(node);
+  });
+
+  canvas.addEventListener('click', function(e) {
+    var node = getNodeAt(e.clientX, e.clientY);
+    selectedNode = node ? (selectedNode === node ? null : node) : null;
+    redraw();
+  });
+
+  canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    camTargetZoom = Math.max(0.3, Math.min(5, camTargetZoom * (e.deltaY > 0 ? 0.9 : 1.1)));
+    redraw();
+  }, { passive: false });
+
+  // Touch
+  var lastTouchDist = 0;
+  canvas.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+      var t = e.touches[0];
+      var node = getNodeAt(t.clientX, t.clientY);
+      if (node) { draggedNode = node; draggedNode.pinned = true; }
+      else { isPanning = true; panStartX = t.clientX; panStartY = t.clientY; panCamStartX = camTargetX; panCamStartY = camTargetY; }
+    } else if (e.touches.length === 2) {
+      lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1) {
+      var t = e.touches[0];
+      if (draggedNode) { var w = screenToWorld(t.clientX, t.clientY); draggedNode.x = w.x; draggedNode.y = w.y; }
+      else if (isPanning) { camTargetX = panCamStartX - (t.clientX - panStartX) / camZoom; camTargetY = panCamStartY - (t.clientY - panStartY) / camZoom; }
+    } else if (e.touches.length === 2) {
+      var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      camTargetZoom = Math.max(0.3, Math.min(5, camTargetZoom * (dist / lastTouchDist)));
+      lastTouchDist = dist;
+    }
+    redraw();
+  }, { passive: true });
+
+  canvas.addEventListener('touchend', function() {
+    if (draggedNode) { draggedNode.pinned = false; draggedNode = null; }
+    isPanning = false;
+  });
+
+  window.addEventListener('resize', function() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
     draw();
-    settleFrames++;
-    if (settleFrames >= SETTLE_FRAMES) { settled = true; draw(); return; }
-    requestAnimationFrame(loop);
+  });
+
+  // Settle then stop
+  var settled = false;
+  var settleFrames = 0;
+  var SETTLE_FRAMES = 200;
+
+  function loop() {
+    if (!settled) {
+      physics();
+      draw();
+      settleFrames++;
+      if (settleFrames >= SETTLE_FRAMES) { settled = true; draw(); return; }
+      requestAnimationFrame(loop);
+    }
   }
-}
-loop();
+
+  // Start
+  draw();
+  loop();
+})();
 </script>
 </body>
 </html>
