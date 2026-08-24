@@ -162,15 +162,6 @@ function openModal(p) {
   overlay.classList.add('active');
 }
 
-// Canvas
-const canvas = document.createElement('canvas');
-document.body.appendChild(canvas);
-const ctx = canvas.getContext('2d');
-let W, H;
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; draw(); }
-resize();
-addEventListener('resize', resize);
-
 // Camera
 let camX = 0, camY = 0, camZoom = 1;
 let camTargetX = 0, camTargetY = 0, camTargetZoom = 1;
@@ -195,6 +186,15 @@ nodes.forEach(n => {
     }
   });
 });
+
+// Canvas
+const canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; draw(); }
+resize();
+addEventListener('resize', resize);
 
 // Physics
 const REPULSION = 3000;
