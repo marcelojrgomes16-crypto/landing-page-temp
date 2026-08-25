@@ -366,14 +366,20 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
   // Settle then stop
   var settled = false;
   var settleFrames = 0;
-  var SETTLE_FRAMES = 200;
+  var SETTLE_FRAMES = 30;
 
   function loop() {
     if (!settled) {
       physics();
       draw();
       settleFrames++;
-      if (settleFrames >= SETTLE_FRAMES) { settled = true; draw(); return; }
+      if (settleFrames >= SETTLE_FRAMES) {
+        settled = true;
+        // Stop all movement
+        nodes.forEach(function(n) { n.vx = 0; n.vy = 0; });
+        draw();
+        return;
+      }
       requestAnimationFrame(loop);
     }
   }
