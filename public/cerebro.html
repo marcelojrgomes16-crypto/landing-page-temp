@@ -77,16 +77,16 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
 <script>
 (function() {
   var PROJECTS = [
-    { id:'cerebro', emoji:'🧠', name:'Cérebro Digital', desc:'Centro de comando.', color:'#bb9af7', size:8, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
-    { id:'v8', emoji:'🏋️', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#f7768e', size:6, connections:['cerebro','deploy'] },
-    { id:'financeiro', emoji:'💰', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#e0af68', size:5, connections:['cerebro','deploy'] },
-    { id:'estoque', emoji:'📦', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#9ece6a', size:5, connections:['cerebro','api','adega'] },
-    { id:'api', emoji:'⚡', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#ff9e64', size:4, connections:['cerebro','estoque'] },
-    { id:'deploy', emoji:'🚀', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#73daca', size:4, connections:['cerebro','v8','financeiro'] },
-    { id:'myrella', emoji:'💕', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#f7768e', size:4, connections:['cerebro','landing'] },
-    { id:'adega', emoji:'🍷', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#bb9af7', size:5, connections:['cerebro','estoque'] },
-    { id:'money', emoji:'💸', name:'MoneyPrinter', desc:'Vídeos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#7aa2f7', size:4, connections:['cerebro'] },
-    { id:'landing', emoji:'🌐', name:'Landing', desc:'Página temporária.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#565f89', size:3, connections:['cerebro','myrella'] }
+    { id:'cerebro', emoji:'🧠', name:'Cérebro Digital', desc:'Centro de comando.', color:'#bb9af7', size:18, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
+    { id:'v8', emoji:'🏋️', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#f7768e', size:14, connections:['cerebro','deploy'] },
+    { id:'financeiro', emoji:'💰', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#e0af68', size:12, connections:['cerebro','deploy'] },
+    { id:'estoque', emoji:'📦', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#9ece6a', size:12, connections:['cerebro','api','adega'] },
+    { id:'api', emoji:'⚡', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#ff9e64', size:10, connections:['cerebro','estoque'] },
+    { id:'deploy', emoji:'🚀', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#73daca', size:10, connections:['cerebro','v8','financeiro'] },
+    { id:'myrella', emoji:'💕', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#f7768e', size:10, connections:['cerebro','landing'] },
+    { id:'adega', emoji:'🍷', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#bb9af7', size:12, connections:['cerebro','estoque'] },
+    { id:'money', emoji:'💸', name:'MoneyPrinter', desc:'Vídeos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#7aa2f7', size:10, connections:['cerebro'] },
+    { id:'landing', emoji:'🌐', name:'Landing', desc:'Página temporária.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#565f89', size:8, connections:['cerebro','myrella'] }
   ];
 
   // Modal
@@ -220,8 +220,8 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
       ctx.beginPath();
       ctx.moveTo(e.a.x, e.a.y);
       ctx.lineTo(e.b.x, e.b.y);
-      ctx.strokeStyle = highlighted ? 'rgba(187,154,247,0.25)' : 'rgba(255,255,255,0.04)';
-      ctx.lineWidth = highlighted ? 1 / camZoom : 0.5 / camZoom;
+      ctx.strokeStyle = highlighted ? 'rgba(187,154,247,0.5)' : 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = highlighted ? 2 / camZoom : 1 / camZoom;
       ctx.stroke();
     });
 
@@ -235,11 +235,11 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
       var r = n.size;
 
       if (isHovered || isSelected) {
-        var glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r * 3);
-        glow.addColorStop(0, n.color + '40');
+        var glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r * 4);
+        glow.addColorStop(0, n.color + '60');
         glow.addColorStop(1, 'transparent');
         ctx.beginPath();
-        ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
         ctx.fillStyle = glow;
         ctx.fill();
       }
@@ -250,6 +250,14 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
       ctx.globalAlpha = dimmed ? 0.3 : 1;
       ctx.fill();
       ctx.globalAlpha = 1;
+
+      // Label
+      if (!dimmed) {
+        ctx.font = 'bold 11px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#c0caf5';
+        ctx.fillText(n.name, n.x, n.y + r + 14);
+      }
     });
 
     ctx.restore();
