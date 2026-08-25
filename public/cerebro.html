@@ -133,9 +133,9 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
     return {
       id: p.id, emoji: p.emoji, name: p.name, desc: p.desc, url: p.url,
       dir: p.dir, file: p.file, color: p.color, size: p.size, connections: p.connections,
-      x: (Math.random() - 0.5) * 400,
-      y: (Math.random() - 0.5) * 300,
-      vx: 0, vy: 0, fx: 0, fy: 0, pinned: false
+      x: (Math.random() - 0.5) * 300,
+      y: (Math.random() - 0.5) * 200,
+      vx: 0, vy: 0, fx: 0, fy: 0
     };
   });
 
@@ -150,8 +150,12 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
     });
   });
 
-  // Physics
-  var REPULSION = 3000, ATTRACTION = 0.008, DAMPING = 0.82, CENTER_GRAVITY = 0.015, NODE_SPEED = 0.25;
+  // Physics - Obsidian style
+  var REPULSION = 5000;
+  var ATTRACTION = 0.01;
+  var DAMPING = 0.6;
+  var CENTER_GRAVITY = 0.02;
+  var MIN_SPEED = 0.01;
   var draggedNode = null, isPanning = false;
   var panStartX, panStartY, panCamStartX, panCamStartY;
   var selectedNode = null, hoveredNode = null;
@@ -167,14 +171,25 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
       var n = nodes[i];
       var dx = w.x - n.x, dy = w.y - n.y;
       var d = Math.sqrt(dx*dx + dy*dy);
-      if (d < n.size + 10 && d < minDist) { closest = n; minDist = d; }
+      if (d < n.size + 12 && d < minDist) { closest = n; minDist = d; }
     }
     return closest;
+  }
+
+  // Check if all nodes are settled
+  function allSettled() {
+    for (var i = 0; i < nodes.length; i++) {
+      var speed = Math.sqrt(nodes[i].vx * nodes[i].vx + nodes[i].vy * nodes[i].vy);
+      if (speed > MIN_SPEED) return false;
+    }
+    return true;
   }
 
   function physics() {
     var i, j, a, b, dx, dy, dist, force, fx, fy;
     for (i = 0; i < nodes.length; i++) { nodes[i].fx = 0; nodes[i].fy = 0; }
+
+    // Repulsion
     for (i = 0; i < nodes.length; i++) {
       for (j = i + 1; j < nodes.length; j++) {
         a = nodes[i]; b = nodes[j];
@@ -186,22 +201,34 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
         a.fx -= fx; a.fy -= fy; b.fx += fx; b.fy += fy;
       }
     }
+
+    // Attraction
     edges.forEach(function(e) {
       dx = e.b.x - e.a.x; dy = e.b.y - e.a.y;
       dist = Math.sqrt(dx*dx + dy*dy);
-      force = (dist - 100) * ATTRACTION;
+      force = (dist - 120) * ATTRACTION;
       fx = (dx / dist) * force; fy = (dy / dist) * force;
       e.a.fx += fx; e.a.fy += fy; e.b.fx -= fx; e.b.fy -= fy;
     });
-    nodes.forEach(function(n) { n.fx -= n.x * CENTER_GRAVITY; n.fy -= n.y * CENTER_GRAVITY; });
+
+    // Center gravity
     nodes.forEach(function(n) {
-      if (n === draggedNode) return;
-      n.vx = (n.vx + n.fx * NODE_SPEED) * DAMPING;
-      n.vy = (n.vy + n.fy * NODE_SPEED) * DAMPING;
-      var speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
-      if (speed > 8) { n.vx = (n.vx/speed)*8; n.vy = (n.vy/speed)*8; }
-      n.x += n.vx; n.y += n.vy;
+      n.fx -= n.x * CENTER_GRAVITY;
+      n.fy -= n.y * CENTER_GRAVITY;
     });
+
+    // Apply forces
+    nodes.forEach(function(n) {
+      n.vx = (n.vx + n.fx) * DAMPING;
+      n.vy = (n.vy + n.fy) * DAMPING;
+      var speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
+      if (speed > 10) { n.vx = (n.vx/speed)*10; n.vy = (n.vy/speed)*10; }
+      if (speed < MIN_SPEED) { n.vx = 0; n.vy = 0; }
+      n.x += n.vx;
+      n.y += n.vy;
+    });
+
+    // Smooth camera
     camX += (camTargetX - camX) * 0.1;
     camY += (camTargetY - camY) * 0.1;
     camZoom += (camTargetZoom - camZoom) * 0.1;
@@ -215,16 +242,18 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
     ctx.scale(camZoom, camZoom);
     ctx.translate(-camX, -camY);
 
+    // Edges
     edges.forEach(function(e) {
       var highlighted = selectedNode && (e.a === selectedNode || e.b === selectedNode);
       ctx.beginPath();
       ctx.moveTo(e.a.x, e.a.y);
       ctx.lineTo(e.b.x, e.b.y);
-      ctx.strokeStyle = highlighted ? 'rgba(187,154,247,0.5)' : 'rgba(255,255,255,0.15)';
+      ctx.strokeStyle = highlighted ? 'rgba(187,154,247,0.5)' : 'rgba(255,255,255,0.12)';
       ctx.lineWidth = highlighted ? 2 / camZoom : 1 / camZoom;
       ctx.stroke();
     });
 
+    // Nodes
     nodes.forEach(function(n) {
       var isHovered = hoveredNode === n;
       var isSelected = selectedNode === n;
@@ -234,6 +263,7 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
       var dimmed = selectedNode && !isSelected && !isConnected;
       var r = n.size;
 
+      // Glow on hover/select
       if (isHovered || isSelected) {
         var glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r * 4);
         glow.addColorStop(0, n.color + '60');
@@ -244,6 +274,7 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
         ctx.fill();
       }
 
+      // Node body
       ctx.beginPath();
       ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
       ctx.fillStyle = dimmed ? n.color + '30' : n.color;
@@ -263,13 +294,11 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
     ctx.restore();
   }
 
-  function redraw() { draw(); }
-
-  // Mouse
+  // Mouse events
   canvas.addEventListener('mousedown', function(e) {
     var node = getNodeAt(e.clientX, e.clientY);
     if (node) {
-      draggedNode = node; draggedNode.pinned = true;
+      draggedNode = node;
       draggedNode.vx = 0; draggedNode.vy = 0;
       document.body.classList.add('node-dragging');
     } else {
@@ -301,11 +330,10 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
     } else {
       tooltip.classList.remove('visible');
     }
-    redraw();
   });
 
   canvas.addEventListener('mouseup', function() {
-    if (draggedNode) { draggedNode.pinned = false; draggedNode = null; document.body.classList.remove('node-dragging'); }
+    if (draggedNode) { draggedNode = null; document.body.classList.remove('node-dragging'); }
     if (isPanning) { isPanning = false; document.body.classList.remove('dragging'); }
   });
 
@@ -317,13 +345,11 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
   canvas.addEventListener('click', function(e) {
     var node = getNodeAt(e.clientX, e.clientY);
     selectedNode = node ? (selectedNode === node ? null : node) : null;
-    redraw();
   });
 
   canvas.addEventListener('wheel', function(e) {
     e.preventDefault();
     camTargetZoom = Math.max(0.3, Math.min(5, camTargetZoom * (e.deltaY > 0 ? 0.9 : 1.1)));
-    redraw();
   }, { passive: false });
 
   // Touch
@@ -332,7 +358,7 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
     if (e.touches.length === 1) {
       var t = e.touches[0];
       var node = getNodeAt(t.clientX, t.clientY);
-      if (node) { draggedNode = node; draggedNode.pinned = true; }
+      if (node) { draggedNode = node; }
       else { isPanning = true; panStartX = t.clientX; panStartY = t.clientY; panCamStartX = camTargetX; panCamStartY = camTargetY; }
     } else if (e.touches.length === 2) {
       lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
@@ -349,43 +375,39 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
       camTargetZoom = Math.max(0.3, Math.min(5, camTargetZoom * (dist / lastTouchDist)));
       lastTouchDist = dist;
     }
-    redraw();
   }, { passive: true });
 
   canvas.addEventListener('touchend', function() {
-    if (draggedNode) { draggedNode.pinned = false; draggedNode = null; }
+    draggedNode = null;
     isPanning = false;
   });
 
   window.addEventListener('resize', function() {
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
-    draw();
   });
 
-  // Settle then stop
-  var settled = false;
-  var settleFrames = 0;
-  var SETTLE_FRAMES = 30;
+  // Main loop - runs continuously like Obsidian
+  var isRunning = true;
+  var lastInteraction = 0;
 
   function loop() {
-    if (!settled) {
-      physics();
-      draw();
-      settleFrames++;
-      if (settleFrames >= SETTLE_FRAMES) {
-        settled = true;
-        // Stop all movement
-        nodes.forEach(function(n) { n.vx = 0; n.vy = 0; });
-        draw();
-        return;
-      }
-      requestAnimationFrame(loop);
-    }
+    var now = Date.now();
+    var timeSinceInteraction = now - lastInteraction;
+
+    // Always run physics, but more actively when interacting
+    physics();
+    draw();
+
+    requestAnimationFrame(loop);
   }
 
-  // Start
-  draw();
+  // Track interactions to boost physics when dragging
+  canvas.addEventListener('mousedown', function() { lastInteraction = Date.now(); });
+  canvas.addEventListener('mousemove', function(e) {
+    if (draggedNode) lastInteraction = Date.now();
+  });
+
   loop();
 })();
 </script>
