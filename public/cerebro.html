@@ -30,7 +30,6 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
   box-shadow: 0 0 60px rgba(0,0,0,0.5); position: relative;
 }
 #modal h2 { color: #c0caf5; font-size: 1.3rem; margin-bottom: 6px; }
-#modal .modal-emoji { font-size: 2.5rem; margin-bottom: 10px; }
 #modal p { color: #565f89; font-size: 0.85rem; margin-bottom: 18px; line-height: 1.5; }
 #modal a { display: inline-block; padding: 9px 24px; background: #7aa2f7; color: #1a1b26; text-decoration: none; border-radius: 6px; font-weight: 600; }
 #modal a:hover { background: #89b4fa; }
@@ -59,7 +58,6 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
 <div id="modal-overlay">
   <div id="modal">
     <button id="modal-close">&times;</button>
-    <div class="modal-emoji" id="modal-emoji"></div>
     <h2 id="modal-title"></h2>
     <p id="modal-desc"></p>
     <div class="modal-buttons">
@@ -77,16 +75,16 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
 <script>
 (function() {
   var PROJECTS = [
-    { id:'cerebro', emoji:'🧠', name:'Cérebro Digital', desc:'Centro de comando.', color:'#bb9af7', size:18, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
-    { id:'v8', emoji:'🏋️', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#f7768e', size:14, connections:['cerebro','deploy'] },
-    { id:'financeiro', emoji:'💰', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#e0af68', size:12, connections:['cerebro','deploy'] },
-    { id:'estoque', emoji:'📦', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#9ece6a', size:12, connections:['cerebro','api','adega'] },
-    { id:'api', emoji:'⚡', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#ff9e64', size:10, connections:['cerebro','estoque'] },
-    { id:'deploy', emoji:'🚀', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#73daca', size:10, connections:['cerebro','v8','financeiro'] },
-    { id:'myrella', emoji:'💕', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#f7768e', size:10, connections:['cerebro','landing'] },
-    { id:'adega', emoji:'🍷', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#bb9af7', size:12, connections:['cerebro','estoque'] },
-    { id:'money', emoji:'💸', name:'MoneyPrinter', desc:'Vídeos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#7aa2f7', size:10, connections:['cerebro'] },
-    { id:'landing', emoji:'🌐', name:'Landing', desc:'Página temporária.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#565f89', size:8, connections:['cerebro','myrella'] }
+    { id:'cerebro', name:'Cerebro Digital', desc:'Centro de comando.', color:'#bb9af7', size:18, connections:['v8','financeiro','estoque','myrella','adega','money','api','deploy'] },
+    { id:'v8', name:'V8 Academia', desc:'Next.js + Prisma.', url:'http://localhost:3000', dir:'C:\\Users\\marcelo.gomes\\v8-academia-painel', file:'src\\app\\page.tsx', color:'#f7768e', size:14, connections:['cerebro','deploy'] },
+    { id:'financeiro', name:'Controle Financeiro', desc:'React Native + Expo.', url:'https://controle-financeiro-mandae.onrender.com', dir:'C:\\Users\\marcelo.gomes\\ControleFinanceiro', file:'App.js', color:'#e0af68', size:12, connections:['cerebro','deploy'] },
+    { id:'estoque', name:'Estoque', desc:'Express + PostgreSQL.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#9ece6a', size:12, connections:['cerebro','api','adega'] },
+    { id:'api', name:'API REST', desc:'Endpoints RESTful.', url:'https://estoque-distribuidora-th3q.onrender.com/api/health', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\routes\\orders.js', color:'#ff9e64', size:10, connections:['cerebro','estoque'] },
+    { id:'deploy', name:'Deploy', desc:'Render.com CI/CD.', url:'https://render.com', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'render.yaml', color:'#73daca', size:10, connections:['cerebro','v8','financeiro'] },
+    { id:'myrella', name:'Myrella', desc:'Landing page.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'public\\index.html', color:'#f7768e', size:10, connections:['cerebro','landing'] },
+    { id:'adega', name:'Adega', desc:'Distribuidora de bebidas.', url:'https://estoque-distribuidora-th3q.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\estoque-distribuidora', file:'src\\server.js', color:'#bb9af7', size:12, connections:['cerebro','estoque'] },
+    { id:'money', name:'MoneyPrinter', desc:'Videos com IA.', url:'https://github.com/harry0703/MoneyPrinterTurbo', dir:'C:\\Users\\marcelo.gomes\\MoneyPrinterTurbo', file:'main.py', color:'#7aa2f7', size:10, connections:['cerebro'] },
+    { id:'landing', name:'Landing', desc:'Pagina temporaria.', url:'https://landing-page-temp.onrender.com/', dir:'C:\\Users\\marcelo.gomes\\landing-page-temp', file:'server.js', color:'#565f89', size:8, connections:['cerebro','myrella'] }
   ];
 
   // Modal
@@ -96,7 +94,6 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
   overlay.onclick = function(e) { if (e.target === overlay) overlay.classList.remove('active'); };
 
   function openModal(p) {
-    document.getElementById('modal-emoji').textContent = p.emoji;
     document.getElementById('modal-title').textContent = p.name;
     document.getElementById('modal-desc').textContent = p.desc;
     document.getElementById('modal-link').href = p.url || '#';
@@ -131,7 +128,7 @@ canvas { display: block; position: fixed; top: 0; left: 0; }
   // Nodes
   var nodes = PROJECTS.map(function(p) {
     return {
-      id: p.id, emoji: p.emoji, name: p.name, desc: p.desc, url: p.url,
+      id: p.id, name: p.name, desc: p.desc, url: p.url,
       dir: p.dir, file: p.file, color: p.color, size: p.size, connections: p.connections,
       x: (Math.random() - 0.5) * 300,
       y: (Math.random() - 0.5) * 200,
